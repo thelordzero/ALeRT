@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ALeRT.UI", "ALeRT.UI\ALeRT.UI.csproj", "{9260B6D1-932B-4BA0-937F-8B9D9A3292AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ALeRT.UI.QueryBox", "ALeRT.UI.QueryBox\ALeRT.UI.QueryBox.csproj", "{340D3597-BB7A-4E48-A31C-55D2D88EC40A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ALeRT.QueryPlugin.Ping", "ALeRT.QueryPlugin.Ping\ALeRT.QueryPlugin.Ping.csproj", "{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,16 @@ Global
 		{340D3597-BB7A-4E48-A31C-55D2D88EC40A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{340D3597-BB7A-4E48-A31C-55D2D88EC40A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{340D3597-BB7A-4E48-A31C-55D2D88EC40A}.Release|x86.ActiveCfg = Release|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{27C2649C-47DE-4AB7-937D-A51D6C2A50FB}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

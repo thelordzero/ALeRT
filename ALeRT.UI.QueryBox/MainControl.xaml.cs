@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace QueryBox
+namespace ALeRT.UI
 {
 	/// <summary>
 	/// Interaction logic for MainControl.xaml
 	/// </summary>
-	public partial class MainControl
+	public partial class QueryBox
 	{
-		public MainControl()
+		public QueryBox()
 		{
 			this.InitializeComponent();
 		}
