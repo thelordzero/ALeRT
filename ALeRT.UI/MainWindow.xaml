@@ -3,7 +3,7 @@
     x:ClassModifier="internal"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:myQueryBox="clr-namespace:ALeRT.UI;assembly=QueryBox"
+    xmlns:myQueryBox="clr-namespace:ALeRT.UI;assembly=ALeRT.UI.QueryBox"
     PreviewMouseMove="HandlePreviewMouseMove"
     MinHeight="600"
     MinWidth="800">

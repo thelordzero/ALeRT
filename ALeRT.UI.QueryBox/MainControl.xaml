@@ -16,11 +16,11 @@
 					<ColumnDefinition Width="23"/>
 				</Grid.ColumnDefinitions>
 				<TextBox Name="QueryText" TextWrapping="NoWrap" Grid.ColumnSpan="1" BorderBrush="{x:Null}" Background="White" BorderThickness="0" VerticalContentAlignment="Center" />
-                <Button Name="QueryButton" Margin="0"  VerticalAlignment="Top" Grid.Column="1" Background="{x:Null}" BorderThickness="0" ToolTip="Query" IsDefault="True" BorderBrush="{x:Null}">
-                    <Image Source="/QueryBox;component/Assets/zoom.png"/>
+                <Button Name="QueryButton" Margin="0"  VerticalAlignment="Center" Grid.Column="1" Background="{x:Null}" BorderThickness="0" ToolTip="Query" IsDefault="True" BorderBrush="{x:Null}">
+                    <Image Source="/ALeRT.UI.QueryBox;component/Assets/zoom.png"/>
                 </Button>
-                <Button Name="BrowseButton" Margin="0" VerticalAlignment="Top" Grid.Column="2" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Click="BrowseButton_Click">
-                    <Image Source="/QueryBox;component/Assets/folder.png" />
+                <Button Name="BrowseButton" Margin="0" VerticalAlignment="Center" Grid.Column="2" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Click="BrowseButton_Click">
+                    <Image Source="/ALeRT.UI.QueryBox;component/Assets/folder.png" />
                 </Button>
             </Grid>
 		</Border>
