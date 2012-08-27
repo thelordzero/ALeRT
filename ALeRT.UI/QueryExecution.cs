@@ -23,25 +23,19 @@ namespace ALeRT
         }
 
         /// <summary>
-        /// Method created as ObservableCollection as to allow QueryPlugin method to begin
+        /// Method created as IObservable as to allow QueryPlugin method to begin
         /// executing queries as results come in from DetermineTypes method.
         /// </summary>
-        //private ObservableCollection<string> DetermineTypes
-        private void DetermineTypes()
+        private IObservable<bool> DetermineTypes()
         {
             throw new NotImplementedException();
-            //Collection<string> results = Collection<string>();
-            // var results;
-            // Need to 
-            // return results;
         }
 
         /// <summary>
-        /// Method created as ObservableCollection to provide results of the various
+        /// Method created as IObservable to provide results of the various
         /// QueryPlugins
         /// </summary>
-        //private ObservableCollection<string> QueryPlugins
-        private void QueryPlugins()
+        private IObservable<Dictionary<string, string>> QueryPlugins()
         {
             throw new NotImplementedException();
         }
