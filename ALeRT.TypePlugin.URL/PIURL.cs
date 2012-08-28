@@ -1,12 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.ComponentModel.Composition;
+using System.Text.RegularExpressions;
+using ALeRT.PluginFramework;
 
 namespace ALeRT.TypePlugin
 {
-    public class PIURL
+    [Export(typeof(ITypePlugin))]
+    public class PIURL : ITypePlugin
     {
-        // Regex RgxUrl = new Regex("(([a-zA-Z][0-9a-zA-Z+\\-\\.]*:)?/{0,2}[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?(#[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?");
+        public string PluginCategory
+        {
+            get { return @"Type"; }
+        }
+
+        public string Name
+        {
+            get { return @"URL"; }
+        }
+
+        public string Version
+        {
+            get { return @"1.0.0"; }
+        }
+
+        public string Author
+        {
+            get { return @"John"; }
+        }
+
+        public bool Result
+        {
+            get
+            {
+                String value = "asdasda asd";
+                return Regex.IsMatch(value, "(([a-zA-Z][0-9a-zA-Z+\\-\\.]*:)?/{0,2}[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?(#[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?");
+            }
+        }
     }
 }

@@ -4,12 +4,15 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Documents;
+using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition;
+using System.IO;
 
 namespace ALeRT
 {
-    class QueryExecution
+    public class QueryExecution
     {
-        QueryExecution(string query)
+        public QueryExecution()
         {
             // Take query from UI and execute DetermineTypes method. Should return a list
             // with what plugins return TRUE or FALSE from a boolean type. All values in
@@ -19,23 +22,48 @@ namespace ALeRT
             // be running asynchronously, possibly by utilizing System.Reactive outside of the 
             // actual plugins.
             DetermineTypes();
-            this.QueryPlugins();
+            //QueryPlugins();
         }
 
         /// <summary>
-        /// Method created as IObservable as to allow QueryPlugin method to begin
-        /// executing queries as results come in from DetermineTypes method.
+        /// Method to load all Type Plugins.
         /// </summary>
-        private IObservable<bool> DetermineTypes()
+        private void DetermineTypes()
         {
-            throw new NotImplementedException();
+            var bootStrapper = new Bootstrapper();
+
+            //An aggregate catalog that combines multiple catalogs
+            var catalog = new AggregateCatalog();
+            //Adds all the parts found in same directory where the application is running!
+            var currentPath = Directory.GetCurrentDirectory();
+            catalog.Catalogs.Add(new DirectoryCatalog(currentPath));
+
+            //Create the CompositionContainer with the parts in the catalog
+            var container = new CompositionContainer(catalog);
+
+            //Fill the imports of this object
+            try
+            {
+                container.ComposeParts(bootStrapper);
+            }
+            catch (CompositionException compositionException)
+            {
+                Console.WriteLine(compositionException.ToString());
+            }
+
+            //Prints all the languages that were found into the application directory
+            var i = 0;
+            foreach (var language in bootStrapper.TPlugins)
+            {
+                //Console.WriteLine("[{0}] {1} by {2}.\n\t{3}\n", language.Version, language.Name, language.Author, language.Result);
+                i++;
+                
+            }
+
+            //throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Method created as IObservable to provide results of the various
-        /// QueryPlugins
-        /// </summary>
-        private IObservable<Dictionary<string, string>> QueryPlugins()
+        private void QueryPlugins()
         {
             throw new NotImplementedException();
         }

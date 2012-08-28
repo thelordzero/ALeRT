@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace ALeRT.PluginFramework
+﻿namespace ALeRT.PluginFramework
 {
     interface IQueryPlugin
     {
-        string Name { get; set; }
-        bool Result { get; set; }
+        string PluginCategory { get; }
+        string Name { get; }
+        string Version { get; }
+        string Author { get; }
+        string Result { get; }
     }
 }

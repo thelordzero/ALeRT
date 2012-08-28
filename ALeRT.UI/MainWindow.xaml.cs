@@ -19,7 +19,7 @@ namespace ALeRT
             = TimeSpan.FromMilliseconds(500);
 
         private HwndSource m_hwndSource;
-        private DateTime   m_headerLastClicked;
+        private DateTime m_headerLastClicked;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainWindow"/> class.
@@ -38,17 +38,17 @@ namespace ALeRT
         /// that contains the event data.</param>
         protected override void OnInitialized(EventArgs e)
         {
-            AllowsTransparency    = false;
-            ResizeMode            = ResizeMode.NoResize;
-            Height                = 480;
-            Width                 = 852;  
+            AllowsTransparency = false;
+            ResizeMode = ResizeMode.NoResize;
+            Height = 480;
+            Width = 852;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            WindowStyle           = WindowStyle.None;
-            
-            SourceInitialized    += HandleSourceInitialized;
+            WindowStyle = WindowStyle.None;
 
-            GotKeyboardFocus     += HandleGotKeyboardFocus;
-            LostKeyboardFocus    += HandleLostKeyboardFocus;
+            SourceInitialized += HandleSourceInitialized;
+
+            GotKeyboardFocus += HandleGotKeyboardFocus;
+            LostKeyboardFocus += HandleLostKeyboardFocus;
 
             base.OnInitialized(e);
         }
@@ -67,7 +67,7 @@ namespace ALeRT
             // which presents WPF content in a Win32 window.
             HwndSource.FromHwnd(m_hwndSource.Handle).AddHook(
                 new HwndSourceHook(NativeMethods.WindowProc));
-            
+
             // http://msdn.microsoft.com/en-us/library/aa969524(VS.85).aspx
             Int32 DWMWA_NCRENDERING_POLICY = 2;
             NativeMethods.DwmSetWindowAttribute(
@@ -79,7 +79,7 @@ namespace ALeRT
             // http://msdn.microsoft.com/en-us/library/aa969512(VS.85).aspx
             NativeMethods.ShowShadowUnderWindow(m_hwndSource.Handle);
         }
-        
+
         /// <summary>
         /// Handles the preview mouse move.
         /// </summary>
@@ -103,7 +103,7 @@ namespace ALeRT
         /// instance containing the event data.</param>
         private void HandleHeaderPreviewMouseDown(Object sender, MouseButtonEventArgs e)
         {
-            
+
             if (DateTime.Now.Subtract(m_headerLastClicked) <= s_doubleClick)
             {
                 // Execute the code inside the event handler for the 
@@ -139,14 +139,14 @@ namespace ALeRT
         /// instance containing the event data.</param>
         private void HandleRestoreClick(Object sender, RoutedEventArgs e)
         {
-            WindowState = (WindowState == WindowState.Normal) 
+            WindowState = (WindowState == WindowState.Normal)
                 ? WindowState.Maximized : WindowState.Normal;
 
             m_frameGrid.IsHitTestVisible
                 = WindowState == WindowState.Maximized
                 ? false : true;
 
-            m_resize.Visibility = (WindowState == WindowState.Maximized) 
+            m_resize.Visibility = (WindowState == WindowState.Maximized)
                 ? Visibility.Hidden : Visibility.Visible;
 
             m_roundBorder.Visibility = (WindowState == WindowState.Maximized)
@@ -284,19 +284,19 @@ namespace ALeRT
         /// <param name="direction">The direction.</param>
         private void ResizeWindow(ResizeDirection direction)
         {
-            NativeMethods.SendMessage(m_hwndSource.Handle, WM_SYSCOMMAND, 
+            NativeMethods.SendMessage(m_hwndSource.Handle, WM_SYSCOMMAND,
                 (IntPtr)(61440 + direction), IntPtr.Zero);
         }
 
         public enum ResizeDirection
         {
-            Left        = 1,
-            Right       = 2,
-            Top         = 3,
-            TopLeft     = 4,
-            TopRight    = 5,
-            Bottom      = 6,
-            BottomLeft  = 7,
+            Left = 1,
+            Right = 2,
+            Top = 3,
+            TopLeft = 4,
+            TopRight = 5,
+            Bottom = 6,
+            BottomLeft = 7,
             BottomRight = 8,
         }
 
@@ -311,32 +311,32 @@ namespace ALeRT
 
             [DllImport("dwmapi.dll")]
             internal static extern Int32 DwmExtendFrameIntoClientArea(
-                IntPtr hWnd, 
+                IntPtr hWnd,
                 ref MARGINS pMarInset);
 
             [DllImport("user32")]
             internal static extern Boolean GetMonitorInfo(
-                IntPtr hMonitor, 
+                IntPtr hMonitor,
                 MONITORINFO lpmi);
 
             [DllImport("User32")]
             internal static extern IntPtr MonitorFromWindow(
-                IntPtr handle, 
+                IntPtr handle,
                 Int32 flags);
 
             [DllImport("user32.dll", CharSet = CharSet.Auto)]
             internal static extern IntPtr SendMessage(
-                IntPtr hWnd, 
-                UInt32 msg, 
-                IntPtr wParam, 
+                IntPtr hWnd,
+                UInt32 msg,
+                IntPtr wParam,
                 IntPtr lParam);
 
             [DebuggerStepThrough]
             internal static IntPtr WindowProc(
-                IntPtr hwnd, 
-                Int32  msg, 
+                IntPtr hwnd,
+                Int32 msg,
                 IntPtr wParam,
-                IntPtr lParam, 
+                IntPtr lParam,
                 ref Boolean handled)
             {
                 switch (msg)
@@ -364,13 +364,13 @@ namespace ALeRT
                     MONITORINFO monitorInfo = new MONITORINFO();
                     GetMonitorInfo(monitor, monitorInfo);
 
-                    RECT rcWorkArea     = monitorInfo.m_rcWork;
-                    RECT rcMonitorArea  = monitorInfo.m_rcMonitor;
+                    RECT rcWorkArea = monitorInfo.m_rcWork;
+                    RECT rcMonitorArea = monitorInfo.m_rcMonitor;
 
                     mmi.m_ptMaxPosition.m_x = Math.Abs(rcWorkArea.m_left - rcMonitorArea.m_left);
-                    mmi.m_ptMaxPosition.m_y = Math.Abs(rcWorkArea.m_top  - rcMonitorArea.m_top);
+                    mmi.m_ptMaxPosition.m_y = Math.Abs(rcWorkArea.m_top - rcMonitorArea.m_top);
 
-                    mmi.m_ptMaxSize.m_x = Math.Abs(rcWorkArea.m_right  - rcWorkArea.m_left);
+                    mmi.m_ptMaxSize.m_x = Math.Abs(rcWorkArea.m_right - rcWorkArea.m_left);
                     mmi.m_ptMaxSize.m_y = Math.Abs(rcWorkArea.m_bottom - rcWorkArea.m_top);
                 }
 
@@ -379,11 +379,11 @@ namespace ALeRT
 
             internal static void ShowShadowUnderWindow(IntPtr intPtr)
             {
-                MARGINS marInset        = new MARGINS();
+                MARGINS marInset = new MARGINS();
                 marInset.m_bottomHeight = -1;
-                marInset.m_leftWidth    = -1;
-                marInset.m_rightWidth   = -1;
-                marInset.m_topHeight    = -1;
+                marInset.m_leftWidth = -1;
+                marInset.m_rightWidth = -1;
+                marInset.m_topHeight = -1;
 
                 DwmExtendFrameIntoClientArea(intPtr, ref marInset);
             }
@@ -392,16 +392,16 @@ namespace ALeRT
             internal sealed class MONITORINFO
             {
                 public Int32 m_cbSize;
-                public RECT  m_rcMonitor;
-                public RECT  m_rcWork;
+                public RECT m_rcMonitor;
+                public RECT m_rcWork;
                 public Int32 m_dwFlags;
 
                 public MONITORINFO()
                 {
-                    m_cbSize    = Marshal.SizeOf(typeof(MONITORINFO));
+                    m_cbSize = Marshal.SizeOf(typeof(MONITORINFO));
                     m_rcMonitor = new RECT();
-                    m_rcWork    = new RECT();
-                    m_dwFlags   = 0;
+                    m_rcWork = new RECT();
+                    m_dwFlags = 0;
                 }
             }
 
@@ -417,17 +417,17 @@ namespace ALeRT
 
                 public RECT(Int32 left, Int32 top, Int32 right, Int32 bottom)
                 {
-                    m_left   = left;
-                    m_top    = top;
-                    m_right  = right;
+                    m_left = left;
+                    m_top = top;
+                    m_right = right;
                     m_bottom = bottom;
                 }
 
                 public RECT(RECT rcSrc)
                 {
-                    m_left   = rcSrc.m_left;
-                    m_top    = rcSrc.m_top;
-                    m_right  = rcSrc.m_right;
+                    m_left = rcSrc.m_left;
+                    m_top = rcSrc.m_top;
+                    m_right = rcSrc.m_right;
                     m_bottom = rcSrc.m_bottom;
                 }
             }
@@ -463,6 +463,11 @@ namespace ALeRT
                 public POINT m_ptMinTrackSize;
                 public POINT m_ptMaxTrackSize;
             };
+        }
+
+        private void queryButton_Click(object sender, RoutedEventArgs e)
+        {
+            QueryExecution test = new QueryExecution();
         }
     }
 }

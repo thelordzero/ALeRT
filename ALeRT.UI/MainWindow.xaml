@@ -1,9 +1,10 @@
 ﻿<Window
-    x:Class="ALeRT.MainWindow"
-    x:ClassModifier="internal"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:myQueryBox="clr-namespace:ALeRT.UI;assembly=ALeRT.UI.QueryBox"
+    xmlns:local="clr-namespace:ALeRT"
+    x:Class="ALeRT.MainWindow"
+    x:ClassModifier="internal"
     PreviewMouseMove="HandlePreviewMouseMove"
     MinHeight="600"
     MinWidth="800">
@@ -46,8 +47,8 @@
                 <RowDefinition Height="50" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <myQueryBox:QueryBox Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" Margin="0,15,70,0" VerticalAlignment="Top"/>
-            <Expander Grid.RowSpan="2" ExpandDirection="Right" HorizontalAlignment="Left" Background="WhiteSmoke" VerticalAlignment="Stretch" MaxWidth="250">
+            <!--<myQueryBox:QueryBox Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" Margin="0,15,70,0" VerticalAlignment="Top" Loaded="QueryBox_Loaded_1" IsEnabled="False" Visibility="Hidden"/>-->
+            <Expander Grid.RowSpan="2" ExpandDirection="Right" HorizontalAlignment="Left" Background="WhiteSmoke" VerticalAlignment="Stretch" MaxWidth="250" Visibility="Hidden">
                 <Expander.Header>
                     <TextBlock Text="Status" RenderTransformOrigin="0.5,0.5" Margin="0,15,0,0" FontWeight="Bold" FontFamily="Consolas" FontSize="12" TextAlignment="Right" >
                         <TextBlock.RenderTransform>
@@ -57,10 +58,11 @@
                         </TextBlock.RenderTransform>
                     </TextBlock>
                 </Expander.Header>
-                <Expander.Content>
-                    <TextBlock TextWrapping="Wrap" Margin="0,5,5,5" Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed velit vel justo malesuada dignissim. Aliquam erat volutpat. Fusce enim odio, porta imperdiet hendrerit nec, pharetra nec sem. Integer volutpat metus a libero posuere sit amet vehicula libero dapibus. In elementum hendrerit venenatis. Cras blandit hendrerit neque, non tincidunt lectus consectetur at. Praesent adipiscing scelerisque libero, nec vestibulum metus luctus et. Vestibulum accumsan ullamcorper elit, in scelerisque tortor vulputate vel. Vestibulum eget nisl mi. Donec vel auctor nisl. Quisque viverra lacus neque, non hendrerit urna. Aenean ut ante et lacus ultricies lobortis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse volutpat ipsum eu nulla varius semper. Maecenas consectetur, ligula eu faucibus molestie, libero risus ultricies est, ac cursus purus leo convallis lectus. Vivamus quis orci purus."/>
-                </Expander.Content>
+                <TextBlock TextWrapping="Wrap" Margin="0,5,5,5" Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed velit vel justo malesuada dignissim. Aliquam erat volutpat. Fusce enim odio, porta imperdiet hendrerit nec, pharetra nec sem. Integer volutpat metus a libero posuere sit amet vehicula libero dapibus. In elementum hendrerit venenatis. Cras blandit hendrerit neque, non tincidunt lectus consectetur at. Praesent adipiscing scelerisque libero, nec vestibulum metus luctus et. Vestibulum accumsan ullamcorper elit, in scelerisque tortor vulputate vel. Vestibulum eget nisl mi. Donec vel auctor nisl. Quisque viverra lacus neque, non hendrerit urna. Aenean ut ante et lacus ultricies lobortis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse volutpat ipsum eu nulla varius semper. Maecenas consectetur, ligula eu faucibus molestie, libero risus ultricies est, ac cursus purus leo convallis lectus. Vivamus quis orci purus."/>
             </Expander>
+            <TextBox x:Name="queryBox" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250"/>
+            <Button x:Name="queryButton" Content="Query" HorizontalAlignment="Left" Margin="265,10,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="queryButton_Click"/>
+            <TextBox x:Name="queryResults" HorizontalAlignment="Left" MinHeight="400" MinWidth="700" Margin="10,10,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" />
         </Grid>
     </Grid>
 </Window>
