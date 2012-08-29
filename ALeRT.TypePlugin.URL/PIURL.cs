@@ -9,6 +9,8 @@ namespace ALeRT.TypePlugin
     [Export(typeof(ITypePlugin))]
     public class PIURL : ITypePlugin
     {
+        private string input;
+
         public string PluginCategory
         {
             get { return @"Type"; }
@@ -29,13 +31,9 @@ namespace ALeRT.TypePlugin
             get { return @"John"; }
         }
 
-        public bool Result
+        public bool Result(string input)
         {
-            get
-            {
-                String value = "asdasda asd";
-                return Regex.IsMatch(value, "(([a-zA-Z][0-9a-zA-Z+\\-\\.]*:)?/{0,2}[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?(#[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?");
-            }
+            return Regex.IsMatch(input, "(([a-zA-Z][0-9a-zA-Z+\\-\\.]*:)?/{0,2}[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?(#[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?");
         }
     }
 }

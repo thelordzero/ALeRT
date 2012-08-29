@@ -6,6 +6,6 @@
         string Name { get; }
         string Version { get; }
         string Author { get; }
-        bool Result { get; }
+        bool Result(string input);
     }
 }

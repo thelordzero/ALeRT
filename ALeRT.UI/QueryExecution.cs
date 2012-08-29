@@ -7,11 +7,15 @@ using System.Windows.Documents;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition;
 using System.IO;
+using ALeRT.PluginFramework;
 
 namespace ALeRT
 {
     public class QueryExecution
     {
+        [ImportMany]
+        public IEnumerable<ITypePlugin> TPlugins { get; set; }
+
         public QueryExecution()
         {
             // Take query from UI and execute DetermineTypes method. Should return a list
@@ -30,37 +34,30 @@ namespace ALeRT
         /// </summary>
         private void DetermineTypes()
         {
-            var bootStrapper = new Bootstrapper();
-
-            //An aggregate catalog that combines multiple catalogs
             var catalog = new AggregateCatalog();
-            //Adds all the parts found in same directory where the application is running!
+
             var currentPath = Directory.GetCurrentDirectory();
             catalog.Catalogs.Add(new DirectoryCatalog(currentPath));
 
-            //Create the CompositionContainer with the parts in the catalog
             var container = new CompositionContainer(catalog);
 
-            //Fill the imports of this object
             try
             {
-                container.ComposeParts(bootStrapper);
+                container.ComposeParts(this);
             }
             catch (CompositionException compositionException)
             {
                 Console.WriteLine(compositionException.ToString());
             }
-
-            //Prints all the languages that were found into the application directory
-            var i = 0;
-            foreach (var language in bootStrapper.TPlugins)
+            catch (Exception ex)
             {
-                //Console.WriteLine("[{0}] {1} by {2}.\n\t{3}\n", language.Version, language.Name, language.Author, language.Result);
-                i++;
-                
+                throw ex;
             }
 
-            //throw new NotImplementedException();
+            foreach (var tPlugins in this.TPlugins)
+            {
+                System.Windows.MessageBox.Show("Category: " + tPlugins.PluginCategory + "\nName: " + tPlugins.Name +"\nThe result is: " + tPlugins.Result("teststuff"));
+            }
         }
 
         private void QueryPlugins()
