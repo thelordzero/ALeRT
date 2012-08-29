@@ -25,20 +25,17 @@ namespace ALeRT
             // dynamic object that gets itterated through. Additionally, all plugins should 
             // be running asynchronously, possibly by utilizing System.Reactive outside of the 
             // actual plugins.
-            DetermineTypes();
+            //DetermineTypes();
             //QueryPlugins();
         }
 
         /// <summary>
         /// Method to load all Type Plugins.
         /// </summary>
-        private void DetermineTypes()
+        private void DetermineTypes(string val)
         {
             var catalog = new AggregateCatalog();
-
-            var currentPath = Directory.GetCurrentDirectory();
-            catalog.Catalogs.Add(new DirectoryCatalog(currentPath));
-
+            catalog.Catalogs.Add(new DirectoryCatalog(Directory.GetCurrentDirectory()));
             var container = new CompositionContainer(catalog);
 
             try
@@ -56,7 +53,7 @@ namespace ALeRT
 
             foreach (var tPlugins in this.TPlugins)
             {
-                System.Windows.MessageBox.Show("Category: " + tPlugins.PluginCategory + "\nName: " + tPlugins.Name +"\nThe result is: " + tPlugins.Result("teststuff"));
+                System.Windows.MessageBox.Show("Category: " + tPlugins.PluginCategory + "\nName: " + tPlugins.Name + "\nThe result is: " + tPlugins.Result(val));
             }
         }
 

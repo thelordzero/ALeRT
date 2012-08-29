@@ -33,7 +33,8 @@ namespace ALeRT.TypePlugin
 
         public bool Result(string input)
         {
-            return Regex.IsMatch(input, "(([a-zA-Z][0-9a-zA-Z+\\-\\.]*:)?/{0,2}[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?(#[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?");
+            return Regex.IsMatch(input, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?");
+
         }
     }
 }

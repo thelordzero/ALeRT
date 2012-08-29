@@ -1,13 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.ComponentModel.Composition;
+using System.Text.RegularExpressions;
+using ALeRT.PluginFramework;
 
 namespace ALeRT.TypePlugin
 {
-    public class PIZipCode
+    [Export(typeof(ITypePlugin))]
+    public class PIURL : ITypePlugin
     {
-        // Match a zip code to be entered either as five digits with an optional four-digit extension: 
-        // ^\d{5}(-\d{4})?$
+        private string input;
+
+        public string PluginCategory
+        {
+            get { return @"Type"; }
+        }
+
+        public string Name
+        {
+            get { return @"ZipCode"; }
+        }
+
+        public string Version
+        {
+            get { return @"1.0.0"; }
+        }
+
+        public string Author
+        {
+            get { return @"John"; }
+        }
+
+        public bool Result(string input)
+        {
+            return Regex.IsMatch(input, @"^\d{5}(-\d{4})?$");
+
+        }
     }
 }
