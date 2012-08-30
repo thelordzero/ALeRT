@@ -1,12 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.ComponentModel.Composition;
+using System.Text.RegularExpressions;
+using ALeRT.PluginFramework;
 
 namespace ALeRT.TypePlugin
 {
-    public class PIHASHID
+    [Export(typeof(ITypePlugin))]
+    public class PIURL : ITypePlugin
     {
-        // Need regex for length of 7 alpha char
+        public string PluginCategory
+        {
+            get { return @"Type"; }
+        }
+
+        public string Name
+        {
+            get { return @"HASHID"; }
+        }
+
+        public string Version
+        {
+            get { return @"1.0.0"; }
+        }
+
+        public string Author
+        {
+            get { return @"John"; }
+        }
+
+        public bool Result(string input)
+        {
+            return Regex.IsMatch(input, @"");
+        }
     }
 }

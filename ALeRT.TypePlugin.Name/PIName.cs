@@ -1,11 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.ComponentModel.Composition;
+using System.Text.RegularExpressions;
+using ALeRT.PluginFramework;
 
 namespace ALeRT.TypePlugin
 {
-    public class PIName
+    [Export(typeof(ITypePlugin))]
+    public class PIURL : ITypePlugin
     {
+        public string PluginCategory
+        {
+            get { return @"Type"; }
+        }
+
+        public string Name
+        {
+            get { return @"Name"; }
+        }
+
+        public string Version
+        {
+            get { return @"1.0.0"; }
+        }
+
+        public string Author
+        {
+            get { return @"John"; }
+        }
+
+        public bool Result(string input)
+        {
+            return Regex.IsMatch(input, @"");
+        }
     }
 }

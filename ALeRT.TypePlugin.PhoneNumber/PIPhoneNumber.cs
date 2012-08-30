@@ -1,13 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.ComponentModel.Composition;
+using System.Text.RegularExpressions;
+using ALeRT.PluginFramework;
 
 namespace ALeRT.TypePlugin
 {
-    public class PIPhoneNumber
+    [Export(typeof(ITypePlugin))]
+    public class PIURL : ITypePlugin
     {
-        // Match a North American phone number with an optional area code and an optional - character to be used in the phone number and no extension:
-        // ^(\(?[0-9]{3}\)?)?\-?[0-9]{3}\-?[0-9]{4}$
+        private string input;
+
+        public string PluginCategory
+        {
+            get { return @"Type"; }
+        }
+
+        public string Name
+        {
+            get { return @"PhoneNumber"; }
+        }
+
+        public string Version
+        {
+            get { return @"1.0.0"; }
+        }
+
+        public string Author
+        {
+            get { return @"John"; }
+        }
+
+        public bool Result(string input)
+        {
+            return Regex.IsMatch(input, @"^(\(?[0-9]{3}\)?)?\-?[0-9]{3}\-?[0-9]{4}$");
+        }
     }
 }

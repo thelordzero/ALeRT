@@ -1,12 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.ComponentModel.Composition;
+using System.Text.RegularExpressions;
+using ALeRT.PluginFramework;
 
-namespace ALeRT.TypePlugin.IPv4
+namespace ALeRT.TypePlugin
 {
-    public class PIIPv4
+    [Export(typeof(ITypePlugin))]
+    public class PIURL : ITypePlugin
     {
-        // ^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$
+        private string input;
+
+        public string PluginCategory
+        {
+            get { return @"Type"; }
+        }
+
+        public string Name
+        {
+            get { return @"IPv4"; }
+        }
+
+        public string Version
+        {
+            get { return @"1.0.0"; }
+        }
+
+        public string Author
+        {
+            get { return @"John"; }
+        }
+
+        public bool Result(string input)
+        {
+            return Regex.IsMatch(input, @"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$");
+        }
     }
 }

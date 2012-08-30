@@ -59,17 +59,44 @@ namespace ALeRT.UI
                 throw ex;
             }
 
+            pluginStatusTB.Text = "Type Plugins Status: ";
             resultsTB.Text = "";
 
             foreach (var tPlugins in this.TPlugins)
             {
-                resultsTB.Text += "Category: " + tPlugins.PluginCategory + "\nName: " + tPlugins.Name + "\nThe result is: " + tPlugins.Result(val) + "\n\n";
+                if (!tPlugins.Result(val))
+                {
+                    pluginStatusTB.Inlines.Add(new Run(tPlugins.Name + " ") { Foreground = Brushes.Red });
+                }
+                else
+                {
+                    pluginStatusTB.Inlines.Add(new Run(tPlugins.Name + " ") { Foreground = Brushes.Green });
+                }
+                //resultsTB.Text += "Category: " + tPlugins.PluginCategory + "\nName: " + tPlugins.Name + "\nThe result is: " + tPlugins.Result(val) + "\n\n";
             }
+
+            //foreach (var tPlugins in this.TPlugins)
+            //{
+            //    resultsTB.Text += "Category: " + tPlugins.PluginCategory + "\nName: " + tPlugins.Name + "\nThe result is: " + tPlugins.Result(val) + "\n\n";
+            //}
         }
 
         private void QueryPlugins()
         {
             throw new NotImplementedException();
+        }
+
+        private void browseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.Filter = "All Files|*.*";
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                queryTB.Text = dlg.FileName;
+            }
         }
     }
 }
