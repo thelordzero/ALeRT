@@ -1,5 +1,6 @@
 ﻿using ALeRT.PluginFramework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
@@ -27,21 +28,7 @@ namespace ALeRT.UI
         public MainWindow()
         {
             InitializeComponent();
-        }
 
-        private void queryButton_Click(object sender, RoutedEventArgs e)
-        {
-            DetermineTypes(queryTB.Text);
-        }
-
-        [ImportMany]
-        public IEnumerable<ITypePlugin> TPlugins { get; set; }
-
-        /// <summary>
-        /// Method to load all Type Plugins.
-        /// </summary>
-        private void DetermineTypes(string val)
-        {
             var catalog = new AggregateCatalog();
             catalog.Catalogs.Add(new DirectoryCatalog(Directory.GetCurrentDirectory()));
             var container = new CompositionContainer(catalog);
@@ -52,15 +39,33 @@ namespace ALeRT.UI
             }
             catch (CompositionException compositionException)
             {
-                Console.WriteLine(compositionException.ToString());
+                MessageBox.Show(compositionException.ToString());
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+        }
 
+        private void queryButton_Click(object sender, RoutedEventArgs e)
+        {
             pluginStatusTB.Text = "Type Plugins Status: ";
             resultsTB.Text = "";
+            DetermineTypes(queryTB.Text);
+        }
+
+        [ImportMany]
+        public IEnumerable<ITypePlugin> TPlugins { get; set; }
+
+        [ImportMany]
+        public IEnumerable<IQueryPlugin> QPlugins { get; set; }
+
+        /// <summary>
+        /// Method to process all Type plugins.
+        /// </summary>
+        private List<string> DetermineTypes(string val)
+        {
+            List<string> typeResultAL = new List<string>();
 
             foreach (var tPlugins in this.TPlugins)
             {
@@ -70,22 +75,37 @@ namespace ALeRT.UI
                 }
                 else
                 {
-                    pluginStatusTB.Inlines.Add(new Run(tPlugins.Name + " ") { Foreground = Brushes.Green });
+                    typeResultAL.Add(tPlugins.Name);
+                    pluginStatusTB.Inlines.Add(new Bold(new Run(tPlugins.Name + " ") { Foreground = Brushes.Green }));
                 }
-                //resultsTB.Text += "Category: " + tPlugins.PluginCategory + "\nName: " + tPlugins.Name + "\nThe result is: " + tPlugins.Result(val) + "\n\n";
             }
 
-            //foreach (var tPlugins in this.TPlugins)
-            //{
-            //    resultsTB.Text += "Category: " + tPlugins.PluginCategory + "\nName: " + tPlugins.Name + "\nThe result is: " + tPlugins.Result(val) + "\n\n";
-            //}
+            return typeResultAL;
         }
 
-        private void QueryPlugins()
+        /// <summary>
+        /// Method to process all Query plugins.
+        /// </summary>
+        private void QueryPlugins(List<string> val, bool sensitive)
         {
-            throw new NotImplementedException();
+            foreach (string tType in val) //Cycle through a List<string>
+            {
+                foreach (var qPlugins in this.QPlugins) //Cycle through all query plugins
+                {
+                    foreach (string qType in qPlugins.TypesAccepted) //Cycle though a List<string> within the IQueryPlugin interface AcceptedTypes
+                    {
+                        if (qType == tType) //Match the two List<strings>, one is the AcceptedTypes and the other is the one returned from ITypeQuery
+                        {
+                            //Perform actions here.
+                        }
+                    }
+                }
+            }
         }
 
+        /// <summary>
+        /// Open a dialog prompt to select a file to process.
+        /// </summary>
         private void browseButton_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
