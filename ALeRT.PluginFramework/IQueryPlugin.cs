@@ -6,15 +6,15 @@
         string Name { get; }
         string Version { get; }
         string Author { get; }
-        System.Collections.Generic.List<string> TypesAccepted { get; }
+        bool IsTypeAcceptable(string type); 
     }
 
-    interface IQueryPluginRBool : IQueryPlugin
+    public interface IQueryPluginRBool : IQueryPlugin
     {
         bool Result(string input, bool sensitive);
     }
 
-    interface IQueryPluginRString : IQueryPlugin
+    public interface IQueryPluginRString : IQueryPlugin
     {
         string Result(string input, bool sensitive);
     }

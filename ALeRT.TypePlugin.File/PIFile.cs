@@ -8,7 +8,7 @@ using System.IO;
 namespace ALeRT.TypePlugin
 {
     [Export(typeof(ITypePlugin))]
-    public class PIURL : ITypePlugin
+    public class PIFile : ITypePlugin
     {
         public string PluginCategory
         {

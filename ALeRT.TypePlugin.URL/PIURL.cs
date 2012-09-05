@@ -9,8 +9,6 @@ namespace ALeRT.TypePlugin
     [Export(typeof(ITypePlugin))]
     public class PIURL : ITypePlugin
     {
-        private string input;
-
         public string PluginCategory
         {
             get { return @"Type"; }
@@ -34,7 +32,6 @@ namespace ALeRT.TypePlugin
         public bool Result(string input)
         {
             return Regex.IsMatch(input, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?");
-
         }
     }
 }

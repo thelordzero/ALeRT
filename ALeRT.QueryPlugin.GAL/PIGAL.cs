@@ -4,17 +4,43 @@ using System.Linq;
 using System.Text;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
+using ALeRT.PluginFramework;
+using System.ComponentModel.Composition;
 using ALeRT.QueryPlugin.GAL;
 
 namespace ALeRT.QueryPlugin
 {
-    public class PIGAL
+    [Export(typeof(IQueryPluginRString))]
+    public class PIGAL : IQueryPluginRString
     {
-
-        // Must accept any valid type from type plugin that can be used in GAL (Name, Email, Phone, HASHID, Department, Office) 
-        // Currently returns a LDAPInformation object, better way for plugin?
-        public PIGAL()
+        public string PluginCategory
         {
+            get { return @"Query"; }
+        }
+
+        public string Name
+        {
+            get { return @"GAL"; }
+        }
+
+        public string Version
+        {
+            get { return @"1.0.0"; }
+        }
+
+        public string Author
+        {
+            get { return @"John"; }
+        }
+
+        public bool IsTypeAcceptable(string type)
+        {
+            return true;
+        }
+
+        public string Result(string input, bool sensitive)
+        {
+            return "";
         }
         
         public static LDAPInformation[] GetGlobalAddressListVIAMail(string email)

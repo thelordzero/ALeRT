@@ -49,7 +49,7 @@ namespace ALeRT.UI
 
         private void queryButton_Click(object sender, RoutedEventArgs e)
         {
-            pluginStatusTB.Text = "Type Plugins Status: ";
+            pluginStatusTB.Text = "TYPE PLUGIN STATUS: ";
             resultsTB.Text = "";
             DetermineTypes(queryTB.Text);
         }
@@ -88,16 +88,13 @@ namespace ALeRT.UI
         /// </summary>
         private void QueryPlugins(List<string> val, bool sensitive)
         {
-            foreach (string tType in val) //Cycle through a List<string>
+            foreach (var qPlugin in this.QPlugins) //Cycle through a List<string>
             {
-                foreach (var qPlugins in this.QPlugins) //Cycle through all query plugins
+                foreach (string tType in val) //Cycle through all query plugins
                 {
-                    foreach (string qType in qPlugins.TypesAccepted) //Cycle though a List<string> within the IQueryPlugin interface AcceptedTypes
+                    if (qPlugin.IsTypeAcceptable(tType))
                     {
-                        if (qType == tType) //Match the two List<strings>, one is the AcceptedTypes and the other is the one returned from ITypeQuery
-                        {
-                            //Perform actions here.
-                        }
+                        //process it here
                     }
                 }
             }

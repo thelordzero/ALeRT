@@ -7,7 +7,7 @@ using ALeRT.PluginFramework;
 namespace ALeRT.TypePlugin
 {
     [Export(typeof(ITypePlugin))]
-    public class PIURL : ITypePlugin
+    public class PIEMail : ITypePlugin
     {
         public string PluginCategory
         {

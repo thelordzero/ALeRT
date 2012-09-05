@@ -7,10 +7,8 @@ using ALeRT.PluginFramework;
 namespace ALeRT.TypePlugin
 {
     [Export(typeof(ITypePlugin))]
-    public class PIURL : ITypePlugin
+    public class PIZipCode : ITypePlugin
     {
-        private string input;
-
         public string PluginCategory
         {
             get { return @"Type"; }
@@ -34,7 +32,6 @@ namespace ALeRT.TypePlugin
         public bool Result(string input)
         {
             return Regex.IsMatch(input, @"^\d{5}(-\d{4})?$");
-
         }
     }
 }
