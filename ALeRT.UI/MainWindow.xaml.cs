@@ -1,4 +1,5 @@
 ﻿using ALeRT.PluginFramework;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace ALeRT.UI
             }
             catch (Exception ex)
             {
-                throw ex;
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -51,7 +52,8 @@ namespace ALeRT.UI
         {
             pluginStatusTB.Text = "TYPE PLUGIN STATUS: ";
             resultsTB.Text = "";
-            DetermineTypes(queryTB.Text);
+
+            QueryPlugins(queryTB.Text, DetermineTypes(queryTB.Text), (bool)sensitiveCB.IsChecked);
         }
 
         [ImportMany]
@@ -86,15 +88,20 @@ namespace ALeRT.UI
         /// <summary>
         /// Method to process all Query plugins.
         /// </summary>
-        private void QueryPlugins(List<string> val, bool sensitive)
+        private void QueryPlugins(string query, List<string> types, bool sensitive)
         {
-            foreach (var qPlugin in this.QPlugins) //Cycle through a List<string>
+            foreach (string tType in types) //Cycle through a List<string>
             {
-                foreach (string tType in val) //Cycle through all query plugins
+                foreach (var qPlugins in this.QPlugins) //Cycle through all query plugins
                 {
-                    if (qPlugin.IsTypeAcceptable(tType))
+                    foreach (string qType in qPlugins.TypesAccepted) //Cycle though a List<string> within the IQueryPlugin interface AcceptedTypes
                     {
-                        //process it here
+                        if (qType == tType) //Match the two List<strings>, one is the AcceptedTypes and the other is the one returned from ITypeQuery
+                        {
+                            resultsTB.Text += "Type: " + qType.ToString() + "\n";
+                            resultsTB.Text += qPlugins.Result(query, qType, sensitive);
+                            resultsTB.Text += "\n";
+                        }
                     }
                 }
             }

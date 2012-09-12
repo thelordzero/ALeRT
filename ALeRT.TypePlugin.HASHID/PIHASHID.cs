@@ -31,7 +31,7 @@ namespace ALeRT.TypePlugin
 
         public bool Result(string input)
         {
-            return Regex.IsMatch(input, @"");
+            return Regex.IsMatch(input, @"^[a-zA-z0-9]{7}$");
         }
     }
 }

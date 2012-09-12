@@ -4,99 +4,87 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Net.NetworkInformation;
+using System.ComponentModel.Composition;
+using ALeRT.PluginFramework;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace ALeRT.QueryPlugin
 {
-    public class PIPing
+    [Export(typeof(IQueryPlugin))]
+    public class PIPing : IQueryPlugin
     {
-        public static void Main(string[] args)
+        public string PluginCategory
         {
-            if (args.Length == 0)
-                throw new ArgumentException("Ping needs a host or IP Address.");
-
-            string who = args[0];
-            AutoResetEvent waiter = new AutoResetEvent(false);
-
-            Ping pingSender = new Ping();
-
-            // When the PingCompleted event is raised,
-            // the PingCompletedCallback method is called.
-            pingSender.PingCompleted += new PingCompletedEventHandler(PingCompletedCallback);
-
-            // Create a buffer of 32 bytes of data to be transmitted.
-            string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-            byte[] buffer = Encoding.ASCII.GetBytes(data);
-
-            // Wait 12 seconds for a reply.
-            int timeout = 12000;
-
-            // Set options for transmission:
-            // The data can go through 64 gateways or routers
-            // before it is destroyed, and the data packet
-            // cannot be fragmented.
-            PingOptions options = new PingOptions(64, true);
-
-            Console.WriteLine("Time to live: {0}", options.Ttl);
-            Console.WriteLine("Don't fragment: {0}", options.DontFragment);
-
-            // Send the ping asynchronously.
-            // Use the waiter as the user token.
-            // When the callback completes, it can wake up this thread.
-            pingSender.SendAsync(who, timeout, buffer, options, waiter);
-
-            // Prevent this example application from ending.
-            // A real application should do something useful
-            // when possible.
-            waiter.WaitOne();
-            Console.WriteLine("Ping example completed.");
+            get { return @"Type"; }
         }
 
-        private static void PingCompletedCallback(object sender, PingCompletedEventArgs e)
+        public string Name
         {
-            // If the operation was canceled, display a message to the user.
-            if (e.Cancelled)
-            {
-                Console.WriteLine("Ping canceled.");
-
-                // Let the main thread resume. 
-                // UserToken is the AutoResetEvent object that the main thread 
-                // is waiting for.
-                ((AutoResetEvent)e.UserState).Set();
-            }
-
-            // If an error occurred, display the exception to the user.
-            if (e.Error != null)
-            {
-                Console.WriteLine("Ping failed:");
-                Console.WriteLine(e.Error.ToString());
-
-                // Let the main thread resume. 
-                ((AutoResetEvent)e.UserState).Set();
-            }
-
-            PingReply reply = e.Reply;
-
-            DisplayReply(reply);
-
-            // Let the main thread resume.
-            ((AutoResetEvent)e.UserState).Set();
+            get { return @"Ping"; }
         }
 
-        public static void DisplayReply(PingReply reply)
+        public string Version
         {
-            if (reply == null)
-                return;
+            get { return @"1.0.0"; }
+        }
 
-            Console.WriteLine("ping status: {0}", reply.Status);
-            if (reply.Status == IPStatus.Success)
-            {
-                Console.WriteLine("Address: {0}", reply.Address.ToString());
-                Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
-                Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
-                Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
-                Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
+        public string Author
+        {
+            get { return @"John"; }
+        }
+
+        public List<string> TypesAccepted
+        {
+            get { 
+                List<string> typesAccepted = new List<string>();
+                //typesAccepted.Add("EMail");
+                //typesAccepted.Add("File");
+                //typesAccepted.Add("HASHID");
+                typesAccepted.Add("IPv4");
+                typesAccepted.Add("IPv6");
+                //typesAccepted.Add("MD5");
+                //typesAccepted.Add("Name");
+                //typesAccepted.Add("PhoneNumber");
+                //typesAccepted.Add("SHA1");
+                //typesAccepted.Add("SHA256");
+                //typesAccepted.Add("URL");
+                //typesAccepted.Add("ZipCode");
+                return typesAccepted;
             }
         }
 
+        public string Result(string input, string type, bool sensitive)
+        {
+            Ping ping = new Ping();
+            PingReply pingReply = ping.Send(input);
+
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                writer.Formatting = Formatting.Indented;
+
+                if (sensitive == true)
+                {
+                    writer.WriteStartObject();
+                    writer.WritePropertyName(this.Name);
+                    writer.WriteValue("FORBIDDEN");
+                    writer.WriteEndObject();
+                }
+                else
+                {
+                    writer.WriteStartObject();
+                    writer.WritePropertyName("RoundtripTime");
+                    writer.WriteValue(pingReply.RoundtripTime);
+                    writer.WritePropertyName("Status");
+                    writer.WriteValue(pingReply.Status);
+                    writer.WriteEndObject();
+                }
+
+                return sw.ToString();
+            }
+        }
     }
 }
