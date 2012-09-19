@@ -16,7 +16,7 @@ namespace ALeRT.QueryPlugin
     {
         public string PluginCategory
         {
-            get { return @"Type"; }
+            get { return @"Query"; }
         }
 
         public string Name
@@ -56,9 +56,6 @@ namespace ALeRT.QueryPlugin
 
         public string Result(string input, string type, bool sensitive)
         {
-            Ping ping = new Ping();
-            PingReply pingReply = ping.Send(input);
-
             StringBuilder sb = new StringBuilder();
             StringWriter sw = new StringWriter(sb);
 
@@ -75,6 +72,9 @@ namespace ALeRT.QueryPlugin
                 }
                 else
                 {
+                    Ping ping = new Ping();
+                    PingReply pingReply = ping.Send(input);
+
                     writer.WriteStartObject();
                     writer.WritePropertyName("RoundtripTime");
                     writer.WriteValue(pingReply.RoundtripTime);
@@ -82,7 +82,6 @@ namespace ALeRT.QueryPlugin
                     writer.WriteValue(pingReply.Status);
                     writer.WriteEndObject();
                 }
-
                 return sw.ToString();
             }
         }

@@ -3,93 +3,119 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
+using System.ComponentModel.Composition;
+using ALeRT.PluginFramework;
+using System.IO;
+using Newtonsoft.Json;
+using System.Management;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace ALeRT.QueryPlugin
 {
-    public class PINSLookup
+    [Export(typeof(IQueryPlugin))]
+    public class PINSLookup : IQueryPlugin
     {
-        /// <summary>
-        /// 
-        /// <title>nslookup</title>
-        /// <description>
-        /// *nix simple nslookup clone for the Win32 platform (Console Application)
-        /// Does A DNS lookup by Host Name or IP. Host Name lookups can return
-        /// multiple IP Ranges.
-        /// </description>
-        /// <author>Doug Bell</author>
-        /// <version>1.0</version>
-        /// <date>March 23 2002</date>
-        /// 
-        /// </summary>
-        class NSLookup
+        public string PluginCategory
         {
-            /// <summary>
-            /// 
-            /// <description>Application entry point.</description>
-            /// <param name="args">Host Address, IP Address or -help command line options</param>
-            /// <return>int Return code 0 for success -1 for failure or error</return>
-            /// 
-            /// </summary>
-            [STAThread]
-            static int Main(string[] args)
+            get { return @"Query"; }
+        }
+
+        public string Name
+        {
+            get { return @"NSLookup"; }
+        }
+
+        public string Version
+        {
+            get { return @"1.0.0"; }
+        }
+
+        public string Author
+        {
+            get { return @"John"; }
+        }
+
+        public List<string> TypesAccepted
+        {
+            get
             {
-                //Make sure we were passed something, otherwise return help.
-                if (args.Length < 1 || args[0].Equals("-help"))
+                List<string> typesAccepted = new List<string>();
+                //typesAccepted.Add("EMail");
+                //typesAccepted.Add("File");
+                //typesAccepted.Add("HASHID");
+                typesAccepted.Add("IPv4");
+                typesAccepted.Add("IPv6");
+                //typesAccepted.Add("MD5");
+                //typesAccepted.Add("Name");
+                //typesAccepted.Add("PhoneNumber");
+                //typesAccepted.Add("SHA1");
+                //typesAccepted.Add("SHA256");
+                typesAccepted.Add("URL");
+                //typesAccepted.Add("ZipCode");
+                return typesAccepted;
+            }
+        }
+
+        public string Result(string input, string type, bool sensitive)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                writer.Formatting = Formatting.Indented;
+
+                if (sensitive == true)
                 {
-                    Console.WriteLine("Usage is: nslookup [Host Name] | [Host IP] | -help");
-                    Console.WriteLine("nslookup foo.bar.com (Returns IP Address for Host Name)");
-                    Console.WriteLine("nslookup 123.123.123.123 (Returns Host Name for Address)");
-                    Console.WriteLine("nslookup -help (Returns this Help Message)");
-                    return -1;
+                    writer.WriteStartObject();
+                    writer.WritePropertyName(this.Name);
+                    writer.WriteValue("FORBIDDEN");
+                    writer.WriteEndObject();
                 }
                 else
                 {
-                    //We have something, try to look it up....
-                    try
+                    if (type == "URL")
                     {
-                        //The IP or Host Entry to lookup
-                        IPHostEntry ipEntry;
-                        //The IP Address Array. Holds an array of resolved Host Names.
-                        IPAddress[] ipAddr;
-                        //Value of alpha characters
-                        char[] alpha = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ-".ToCharArray();
-                        //If alpha characters exist we know we are doing a forward lookup
-                        if (args[0].IndexOfAny(alpha) != -1)
-                        {
-                            ipEntry = Dns.GetHostEntry(args[0]);
-                            ipAddr = ipEntry.AddressList;
-                            Console.WriteLine("\nHost Name : " + args[0]);
-                            int i = 0;
-                            int len = ipAddr.Length;
-                            for (i = 0; i < len; i++)
-                            {
-                                Console.WriteLine("Address {0} : {1} ", i, ipAddr[i].ToString());
-                            }
-                            return 0;
-                        }
-                        //If no alpha characters exist we do a reverse lookup
-                        else
-                        {
-                            ipEntry = Dns.GetHostEntry(args[0]);
-                            Console.WriteLine("Address : " + args[0]);
-                            Console.WriteLine("Host Name : " + ipEntry.HostName);
-                            return 0;
-                        }
+                        input = new Uri(input).Host;
                     }
-                    catch (System.Net.Sockets.SocketException se)
+
+                    Process scanProcess = new Process();
+
+                    scanProcess.StartInfo.RedirectStandardError = true;
+                    scanProcess.StartInfo.RedirectStandardOutput = true;
+                    scanProcess.StartInfo.UseShellExecute = false;
+                    scanProcess.StartInfo.FileName = "cmd.exe";
+                    scanProcess.StartInfo.Arguments = "/c nslookup " + input + " 8.8.8.8";
+                    scanProcess.StartInfo.CreateNoWindow = true;
+                    scanProcess.Start();
+
+                    StreamReader sOut = scanProcess.StandardOutput;
+                    StringBuilder result = new StringBuilder();
+                    string temp;
+
+                    while ((temp = sOut.ReadLine()) != null)
                     {
-                        // The system had problems resolving the address passed
-                        Console.WriteLine(se.Message.ToString());
-                        return -1;
+                        result.AppendLine(temp);
                     }
-                    catch (System.FormatException fe)
+
+                    sOut = scanProcess.StandardError;
+
+                    while ((temp = sOut.ReadLine()) != null)
                     {
-                        // Non unicode chars were probably passed 
-                        Console.WriteLine(fe.Message.ToString());
-                        return -1;
+                        result.AppendLine(temp);
                     }
+
+                    sOut.Close();
+                    scanProcess.Close();
+
+                    writer.WriteStartObject();
+                    writer.WritePropertyName("Output");
+                    writer.WriteValue(result.ToString());
+                    writer.WriteEndObject();
                 }
-            }//End Main(string[])
-        }//End NSLookup Class
+                return sw.ToString();
+            }
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace ALeRT.TypePlugin
 
         public bool Result(string input)
         {
-            return Regex.IsMatch(input, @"");
+            return Regex.IsMatch(input, @"^([ \u00c0-\u01ffa-zA-Z'\-])+$");
         }
     }
 }

@@ -16,7 +16,7 @@ namespace ALeRT.QueryPlugin
     {
         public string PluginCategory
         {
-            get { return @"Type"; }
+            get { return @"Query"; }
         }
 
         public string Name

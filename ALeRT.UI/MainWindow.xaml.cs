@@ -98,9 +98,10 @@ namespace ALeRT.UI
                     {
                         if (qType == tType) //Match the two List<strings>, one is the AcceptedTypes and the other is the one returned from ITypeQuery
                         {
-                            resultsTB.Text += "Type: " + qType.ToString() + "\n";
+                            resultsTB.Text += "Type: " + qType.ToString() + " in ";
+                            resultsTB.Text += "Plugin: " + qPlugins.Name + "\n";
                             resultsTB.Text += qPlugins.Result(query, qType, sensitive);
-                            resultsTB.Text += "\n";
+                            resultsTB.Text += "\n\n";
                         }
                     }
                 }
