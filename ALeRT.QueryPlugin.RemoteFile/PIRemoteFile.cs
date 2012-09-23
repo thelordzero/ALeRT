@@ -1,12 +1,12 @@
 ﻿using ALeRT.PluginFramework;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using Newtonsoft.Json;
 
 namespace ALeRT.QueryPlugin
 {
@@ -41,8 +41,8 @@ namespace ALeRT.QueryPlugin
                 //typesAccepted.Add("EMail");
                 //typesAccepted.Add("File");
                 //typesAccepted.Add("HASHID");
-                typesAccepted.Add("IPv4");
-                typesAccepted.Add("IPv6");
+                //typesAccepted.Add("IPv4");
+                //typesAccepted.Add("IPv6");
                 //typesAccepted.Add("MD5");
                 //typesAccepted.Add("Name");
                 //typesAccepted.Add("PhoneNumber");
@@ -76,20 +76,19 @@ namespace ALeRT.QueryPlugin
                     {
                         WebClient webClient = new WebClient();
                         webClient.DownloadFile(input, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\\\" + Path.GetFileName(new Uri(input).LocalPath));
+
+                        writer.WriteStartObject();
+                        writer.WritePropertyName("Download");
+                        writer.WriteValue("Successful");
+                        writer.WriteEndObject();
                     }
-                    catch (WebException)
+                    catch (WebException e)
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName("Error");
-                        writer.WriteValue(""); 
+                        writer.WriteValue(e.Message);
                         writer.WriteEndObject();
-                        
                     }
-
-                    writer.WriteStartObject();
-                    writer.WritePropertyName("Downloaded");
-                    writer.WriteValue("");
-                    writer.WriteEndObject();
                 }
                 return sw.ToString();
             }

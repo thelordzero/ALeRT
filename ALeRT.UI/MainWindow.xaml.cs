@@ -1,5 +1,7 @@
 ﻿using ALeRT.PluginFramework;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,10 +52,32 @@ namespace ALeRT.UI
 
         private void queryButton_Click(object sender, RoutedEventArgs e)
         {
-            pluginStatusTB.Text = "TYPE PLUGIN STATUS: ";
+            //pluginStatusTB.Text = "TYPE PLUGINS LOADED: ";
             resultsTB.Text = "";
 
-            QueryPlugins(queryTB.Text, DetermineTypes(queryTB.Text), (bool)sensitiveCB.IsChecked);
+            string line;
+            ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;
+            if (File.Exists(queryTB.Text) && (bool)listCB.IsChecked)
+            {
+                StreamReader file = null;
+                try
+                {
+                    file = new StreamReader(queryTB.Text);
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        QueryPlugins(line, DetermineTypes(line), (bool)sensitiveCB.IsChecked);
+                    }
+                }
+                finally
+                {
+                    if (file != null)
+                        file.Close();
+                }
+            }
+            else
+            {
+                QueryPlugins(queryTB.Text, DetermineTypes(queryTB.Text), (bool)sensitiveCB.IsChecked);
+            }
         }
 
         [ImportMany]
@@ -71,14 +95,9 @@ namespace ALeRT.UI
 
             foreach (var tPlugins in this.TPlugins)
             {
-                if (!tPlugins.Result(val))
-                {
-                    pluginStatusTB.Inlines.Add(new Run(tPlugins.Name + " ") { Foreground = Brushes.Red });
-                }
-                else
+                if (tPlugins.Result(val))
                 {
                     typeResultAL.Add(tPlugins.Name);
-                    pluginStatusTB.Inlines.Add(new Bold(new Run(tPlugins.Name + " ") { Foreground = Brushes.Green }));
                 }
             }
 
@@ -98,10 +117,23 @@ namespace ALeRT.UI
                     {
                         if (qType == tType) //Match the two List<strings>, one is the AcceptedTypes and the other is the one returned from ITypeQuery
                         {
-                            resultsTB.Text += "Type: " + qType.ToString() + " in ";
-                            resultsTB.Text += "Plugin: " + qPlugins.Name + "\n";
-                            resultsTB.Text += qPlugins.Result(query, qType, sensitive);
+                            //resultsTB.Text += "Type: " + qType.ToString() + " in ";
+                            //resultsTB.Text += "Plugin: " + qPlugins.Name + " (" + query + ")\n";
+                            resultsTB.Text += "\"" + qType.ToString() + qPlugins.Name + "(" + query + ")\": " + qPlugins.Result(query, qType, sensitive) + "\n\n";
                             resultsTB.Text += "\n\n";
+
+                            //XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode("{\"" + qType.ToString() + qPlugins.Name + "" + query + "\": "  + qPlugins.Result(query, qType, sensitive) + "}");
+                            //StringBuilder sb = new StringBuilder();
+                            //System.IO.TextWriter tr = new System.IO.StringWriter(sb);
+                            //XmlTextWriter wr = new XmlTextWriter(tr);
+                            //wr.Formatting = System.Xml.Formatting.Indented;
+                            //doc.Save(wr);
+                            //wr.Close();
+                            //resultsTB.Text = sb.ToString();
+
+                            //dynamic newValue = JsonConvert.DeserializeObject<DynamicDictionary>("{\"" + qType.ToString() + qPlugins.Name + "" + query + "\": " + qPlugins.Result(query, qType, sensitive) + "}");
+                            //string role = newValue.Mail[0];
+                            //resultsTB.Text = "";
                         }
                     }
                 }
@@ -122,6 +154,12 @@ namespace ALeRT.UI
             {
                 queryTB.Text = dlg.FileName;
             }
+        }
+
+        private void csvButton_Click(object sender, RoutedEventArgs e)
+        {
+            dynamic stuff = JsonConvert.ToString(resultsTB.Text);
+            resultsTB.Text = stuff.ToString();
         }
     }
 }

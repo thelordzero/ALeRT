@@ -48,7 +48,7 @@ namespace ALeRT.QueryPlugin
                 //typesAccepted.Add("PhoneNumber");
                 //typesAccepted.Add("SHA1");
                 //typesAccepted.Add("SHA256");
-                //typesAccepted.Add("URL");
+                typesAccepted.Add("URL");
                 //typesAccepted.Add("ZipCode");
                 return typesAccepted;
             }
@@ -72,14 +72,19 @@ namespace ALeRT.QueryPlugin
                 }
                 else
                 {
+                    if (type == "URL")
+                    {
+                        input = new Uri(input).Host;
+                    }
+
                     Ping ping = new Ping();
                     PingReply pingReply = ping.Send(input);
 
                     writer.WriteStartObject();
                     writer.WritePropertyName("RoundtripTime");
-                    writer.WriteValue(pingReply.RoundtripTime);
+                    writer.WriteValue(pingReply.RoundtripTime.ToString());
                     writer.WritePropertyName("Status");
-                    writer.WriteValue(pingReply.Status);
+                    writer.WriteValue(pingReply.Status.ToString());
                     writer.WriteEndObject();
                 }
                 return sw.ToString();

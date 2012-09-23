@@ -98,7 +98,7 @@ namespace ALeRT.QueryPlugin
 
                         writer.WriteStartObject();
                         writer.WritePropertyName("Address");
-                        if (prReturnValue[iC1].Address.ToString() != null) 
+                        if (prReturnValue[iC1].Address.ToString() != null)
                         {
                             writer.WriteValue(prReturnValue[iC1].Address.ToString());
                         }

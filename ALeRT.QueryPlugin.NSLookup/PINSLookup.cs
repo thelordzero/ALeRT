@@ -86,7 +86,8 @@ namespace ALeRT.QueryPlugin
                     scanProcess.StartInfo.RedirectStandardOutput = true;
                     scanProcess.StartInfo.UseShellExecute = false;
                     scanProcess.StartInfo.FileName = "cmd.exe";
-                    scanProcess.StartInfo.Arguments = "/c nslookup " + input + " 8.8.8.8";
+                    scanProcess.StartInfo.Arguments = "/c nslookup " + input;
+                    //scanProcess.StartInfo.Arguments = "/c nslookup " + input + " 8.8.8.8"; // This utilizes Google's DNS
                     scanProcess.StartInfo.CreateNoWindow = true;
                     scanProcess.Start();
 
@@ -109,9 +110,19 @@ namespace ALeRT.QueryPlugin
                     sOut.Close();
                     scanProcess.Close();
 
+                    char[] delimiterChars = { ',', '\t', '\r', '\n' };
+                    string[] words = result.ToString().Split(delimiterChars);
+
                     writer.WriteStartObject();
-                    writer.WritePropertyName("Output");
-                    writer.WriteValue(result.ToString());
+                    foreach (string s in words)
+                    {
+                        if (s != "")
+                        {
+                            writer.WritePropertyName("Output");
+                            writer.WriteValue(s);
+                        }
+                    }
+
                     writer.WriteEndObject();
                 }
                 return sw.ToString();
