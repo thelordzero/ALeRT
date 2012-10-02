@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ALeRT" MinHeight="350" MinWidth="550"
         FocusManager.FocusedElement="{Binding ElementName=queryTB}">
+    
     <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -25,10 +26,10 @@
                 <CheckBox Content="Sensitive" Margin="0,0,5,0" Name="sensitiveCB"/>
             </StackPanel>
         </StackPanel>
-        <!--<TextBlock Name="pluginStatusTB" Margin="6,0,6,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center"/>-->
-        <TextBox Name="resultsTB" Margin="5,5,5,5" Grid.Row="1" TextWrapping="NoWrap" Background="{x:Null}" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
-        <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="SteelBlue" Grid.Row="2">
-            <Button Name="csvButton" Content="CSV" Margin="5,5,5,5" Width="55" VerticalContentAlignment="Center" Click="csvButton_Click" />
-        </StackPanel>-->
+        <DataGrid Name="resultsDG" Grid.Row="1" Margin="5" IsReadOnly="True"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="SteelBlue" Grid.Row="2">
+            <TextBlock Text="Plugin:" VerticalAlignment="Center" Margin="5"/>
+            <ComboBox Name="pluginsLB" Margin="5" Width="150" IsReadOnly="True" ItemsSource="{Binding}" SelectionChanged="pluginsLB_SelectionChanged"/>
+        </StackPanel>
     </Grid>
 </Window>

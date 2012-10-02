@@ -48,7 +48,7 @@ namespace ALeRT.QueryPlugin
                 //typesAccepted.Add("PhoneNumber");
                 //typesAccepted.Add("SHA1");
                 //typesAccepted.Add("SHA256");
-                typesAccepted.Add("URL");
+                //typesAccepted.Add("URL");
                 //typesAccepted.Add("ZipCode");
                 return typesAccepted;
             }

@@ -44,14 +44,14 @@ namespace ALeRT.QueryPlugin
                 //typesAccepted.Add("EMail");
                 //typesAccepted.Add("File");
                 //typesAccepted.Add("HASHID");
-                typesAccepted.Add("IPv4");
-                typesAccepted.Add("IPv6");
+                //typesAccepted.Add("IPv4");
+                //typesAccepted.Add("IPv6");
                 //typesAccepted.Add("MD5");
                 //typesAccepted.Add("Name");
                 //typesAccepted.Add("PhoneNumber");
                 //typesAccepted.Add("SHA1");
                 //typesAccepted.Add("SHA256");
-                typesAccepted.Add("URL");
+                //typesAccepted.Add("URL");
                 //typesAccepted.Add("ZipCode");
                 return typesAccepted;
             }

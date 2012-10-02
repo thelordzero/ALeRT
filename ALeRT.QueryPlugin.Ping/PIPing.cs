@@ -6,7 +6,6 @@ using System.Threading;
 using System.Net.NetworkInformation;
 using System.ComponentModel.Composition;
 using ALeRT.PluginFramework;
-using Newtonsoft.Json;
 using System.IO;
 
 namespace ALeRT.QueryPlugin
@@ -56,39 +55,24 @@ namespace ALeRT.QueryPlugin
 
         public string Result(string input, string type, bool sensitive)
         {
-            StringBuilder sb = new StringBuilder();
-            StringWriter sw = new StringWriter(sb);
+            string csv = "\"Roundtrip Time\"," + "\"Status\"\n";
 
-            using (JsonWriter writer = new JsonTextWriter(sw))
+            if (sensitive == true)
             {
-                writer.Formatting = Formatting.Indented;
-
-                if (sensitive == true)
-                {
-                    writer.WriteStartObject();
-                    writer.WritePropertyName(this.Name);
-                    writer.WriteValue("FORBIDDEN");
-                    writer.WriteEndObject();
-                }
-                else
-                {
-                    if (type == "URL")
-                    {
-                        input = new Uri(input).Host;
-                    }
-
-                    Ping ping = new Ping();
-                    PingReply pingReply = ping.Send(input);
-
-                    writer.WriteStartObject();
-                    writer.WritePropertyName("RoundtripTime");
-                    writer.WriteValue(pingReply.RoundtripTime.ToString());
-                    writer.WritePropertyName("Status");
-                    writer.WriteValue(pingReply.Status.ToString());
-                    writer.WriteEndObject();
-                }
-                return sw.ToString();
+                csv += "\"" + "" + "\"," + "\"" + "FORBIDDEN" + "\"\n";
             }
+            else
+            {
+                if (type == "URL")
+                {
+                    input = new Uri(input).Host;
+                }
+                Ping ping = new Ping();
+                PingReply pingReply = ping.Send(input);
+
+                csv += "\"" + pingReply.RoundtripTime.ToString() + "\"," + "\"" + pingReply.Status.ToString() + "\"\n";
+            }
+            return csv;
         }
     }
 }

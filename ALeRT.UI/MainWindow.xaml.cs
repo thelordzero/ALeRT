@@ -20,6 +20,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GenericParsing;
+using System.Windows.Markup;
+using System.Data;
 
 namespace ALeRT.UI
 {
@@ -44,6 +47,7 @@ namespace ALeRT.UI
             {
                 MessageBox.Show(compositionException.ToString());
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
@@ -52,11 +56,8 @@ namespace ALeRT.UI
 
         private void queryButton_Click(object sender, RoutedEventArgs e)
         {
-            //pluginStatusTB.Text = "TYPE PLUGINS LOADED: ";
-            resultsTB.Text = "";
-
             string line;
-            ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;
+
             if (File.Exists(queryTB.Text) && (bool)listCB.IsChecked)
             {
                 StreamReader file = null;
@@ -70,15 +71,18 @@ namespace ALeRT.UI
                 }
                 finally
                 {
-                    if (file != null)
-                        file.Close();
+                    if (file != null) { file.Close(); }
                 }
             }
             else
             {
                 QueryPlugins(queryTB.Text, DetermineTypes(queryTB.Text), (bool)sensitiveCB.IsChecked);
             }
+
+
         }
+
+        DataSet resultDS = new DataSet("Results");
 
         [ImportMany]
         public IEnumerable<ITypePlugin> TPlugins { get; set; }
@@ -100,7 +104,6 @@ namespace ALeRT.UI
                     typeResultAL.Add(tPlugins.Name);
                 }
             }
-
             return typeResultAL;
         }
 
@@ -113,27 +116,48 @@ namespace ALeRT.UI
             {
                 foreach (var qPlugins in this.QPlugins) //Cycle through all query plugins
                 {
-                    foreach (string qType in qPlugins.TypesAccepted) //Cycle though a List<string> within the IQueryPlugin interface AcceptedTypes
+                    foreach (string qType in qPlugins.TypesAccepted)  //Cycle though a List<string> within the IQueryPlugin interface AcceptedTypes
                     {
                         if (qType == tType) //Match the two List<strings>, one is the AcceptedTypes and the other is the one returned from ITypeQuery
                         {
-                            //resultsTB.Text += "Type: " + qType.ToString() + " in ";
-                            //resultsTB.Text += "Plugin: " + qPlugins.Name + " (" + query + ")\n";
-                            resultsTB.Text += "\"" + qType.ToString() + qPlugins.Name + "(" + query + ")\": " + qPlugins.Result(query, qType, sensitive) + "\n\n";
-                            resultsTB.Text += "\n\n";
+                            using (GenericParserAdapter parser = new GenericParserAdapter())
+                            {
+                                using (TextReader sr = new StringReader(qPlugins.Result(query, qType, sensitive)))
+                                {
+                                    Random rNum = new Random();
 
-                            //XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode("{\"" + qType.ToString() + qPlugins.Name + "" + query + "\": "  + qPlugins.Result(query, qType, sensitive) + "}");
-                            //StringBuilder sb = new StringBuilder();
-                            //System.IO.TextWriter tr = new System.IO.StringWriter(sb);
-                            //XmlTextWriter wr = new XmlTextWriter(tr);
-                            //wr.Formatting = System.Xml.Formatting.Indented;
-                            //doc.Save(wr);
-                            //wr.Close();
-                            //resultsTB.Text = sb.ToString();
+                                    parser.SetDataSource(sr);
+                                    parser.ColumnDelimiter = Convert.ToChar(",");
+                                    parser.FirstRowHasHeader = true;
+                                    parser.MaxBufferSize = 4096;
+                                    parser.MaxRows = 500;
+                                    parser.TextQualifier = '\"';
 
-                            //dynamic newValue = JsonConvert.DeserializeObject<DynamicDictionary>("{\"" + qType.ToString() + qPlugins.Name + "" + query + "\": " + qPlugins.Result(query, qType, sensitive) + "}");
-                            //string role = newValue.Mail[0];
-                            //resultsTB.Text = "";
+                                    DataTable tempTable = parser.GetDataTable();
+                                    tempTable.TableName = qPlugins.Name.ToString();
+                                    if (!tempTable.Columns.Contains("Query"))
+                                    {
+                                        DataColumn tColumn = new DataColumn("Query");
+                                        tempTable.Columns.Add(tColumn);
+                                        tColumn.SetOrdinal(0);
+                                    }
+
+                                    foreach (DataRow dr in tempTable.Rows)
+                                    {
+                                        dr["Query"] = query;
+                                    }
+
+                                    if (!resultDS.Tables.Contains(qPlugins.Name.ToString()))
+                                    {
+                                        resultDS.Tables.Add(tempTable);
+                                    }
+                                    else
+                                    {
+                                        resultDS.Tables[qPlugins.Name.ToString()].Merge(tempTable);
+                                    }
+                                    pluginsLB.DataContext = resultDS.Tables.Cast<DataTable>().Select(t => t.TableName).ToList();
+                                }
+                            }
                         }
                     }
                 }
@@ -156,10 +180,9 @@ namespace ALeRT.UI
             }
         }
 
-        private void csvButton_Click(object sender, RoutedEventArgs e)
+        private void pluginsLB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            dynamic stuff = JsonConvert.ToString(resultsTB.Text);
-            resultsTB.Text = stuff.ToString();
+            resultsDG.ItemsSource = resultDS.Tables[pluginsLB.SelectedValue.ToString()].DefaultView;
         }
     }
 }

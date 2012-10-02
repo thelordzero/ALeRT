@@ -98,7 +98,14 @@ namespace ALeRT.QueryPlugin
 
                         LDAPInformation[] temp = (searcher.FindAll().Cast<SearchResult>().Select(result => new LDAPInformation(result.GetDirectoryEntry())).ToArray());
 
-                        return JsonConvert.SerializeObject(temp, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        string csv = "\"" + "DisplayName" + "\"," + "\"" + "EMail" + "\"," + "\"" + "HASH" + "\"," + "\"" + "Phone" + "\"\n";
+
+                        foreach (LDAPInformation t in temp)
+                        {
+                            csv += "\"" + t.DisplayName + "\"," + "\"" + t.Mail + "\"," + "\"" + t.sAMAccountName + "\"," + "\"" + t.TelephoneNumber + "\"\n";
+                        }
+
+                        return csv;
                     }
                 }
             }
