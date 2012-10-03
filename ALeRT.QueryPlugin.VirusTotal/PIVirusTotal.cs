@@ -11,7 +11,7 @@ namespace ALeRT.QueryPlugin
     public class PIVirusTotal
     {
         // Needs to accept FILE, MD5, SHA1, SHA256, or URL
-        // Outputs a JSON string
+        // Outputs a CSV
 
         private string APIKey = "REMOVED";
         private string FileReportURL = "https://www.virustotal.com/vtapi/v2/file/report";

@@ -58,6 +58,8 @@ namespace ALeRT.UI
         {
             string line;
 
+            //resultDS.Reset(); //Looking for a way to clear our the contents from last time without breaking SelectionChanged
+
             if (File.Exists(queryTB.Text) && (bool)listCB.IsChecked)
             {
                 StreamReader file = null;

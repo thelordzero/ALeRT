@@ -6,7 +6,6 @@ using System.Net;
 using System.Text;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using Newtonsoft.Json;
 
 namespace ALeRT.QueryPlugin
 {
@@ -48,7 +47,7 @@ namespace ALeRT.QueryPlugin
                 //typesAccepted.Add("PhoneNumber");
                 //typesAccepted.Add("SHA1");
                 //typesAccepted.Add("SHA256");
-                //typesAccepted.Add("URL");
+                typesAccepted.Add("URL");
                 //typesAccepted.Add("ZipCode");
                 return typesAccepted;
             }
@@ -56,19 +55,10 @@ namespace ALeRT.QueryPlugin
 
         public string Result(string input, string type, bool sensitive)
         {
-            StringBuilder sb = new StringBuilder();
-            StringWriter sw = new StringWriter(sb);
-
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-                writer.Formatting = Formatting.Indented;
-
+            string csv = "\"Status\"," + "\"Message\"\n";
                 if (sensitive == true)
                 {
-                    writer.WriteStartObject();
-                    writer.WritePropertyName(this.Name);
-                    writer.WriteValue("FORBIDDEN");
-                    writer.WriteEndObject();
+                    csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
                 }
                 else
                 {
@@ -77,21 +67,15 @@ namespace ALeRT.QueryPlugin
                         WebClient webClient = new WebClient();
                         webClient.DownloadFile(input, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\\\" + Path.GetFileName(new Uri(input).LocalPath));
 
-                        writer.WriteStartObject();
-                        writer.WritePropertyName("Download");
-                        writer.WriteValue("Successful");
-                        writer.WriteEndObject();
+                        csv += "\"" + "Successful" + "\"," + "\"" + "" + "\"\n";
                     }
                     catch (WebException e)
                     {
-                        writer.WriteStartObject();
-                        writer.WritePropertyName("Error");
-                        writer.WriteValue(e.Message);
-                        writer.WriteEndObject();
+                        csv += "\"" + "Error" + "\"," + "\"" + e.Message + "\"\n";
                     }
                 }
-                return sw.ToString();
-            }
+                return csv;
+            
         }
     }
 }
