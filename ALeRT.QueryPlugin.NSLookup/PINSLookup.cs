@@ -58,74 +58,62 @@ namespace ALeRT.QueryPlugin
 
         public string Result(string input, string type, bool sensitive)
         {
-            StringBuilder sb = new StringBuilder();
-            StringWriter sw = new StringWriter(sb);
+            string csv = "\"Status\"," + "\"Message\"\n";
 
-            using (JsonWriter writer = new JsonTextWriter(sw))
+            if (sensitive == true)
             {
-                writer.Formatting = Formatting.Indented;
-
-                if (sensitive == true)
-                {
-                    writer.WriteStartObject();
-                    writer.WritePropertyName(this.Name);
-                    writer.WriteValue("FORBIDDEN");
-                    writer.WriteEndObject();
-                }
-                else
-                {
-                    if (type == "URL")
-                    {
-                        input = new Uri(input).Host;
-                    }
-
-                    Process scanProcess = new Process();
-
-                    scanProcess.StartInfo.RedirectStandardError = true;
-                    scanProcess.StartInfo.RedirectStandardOutput = true;
-                    scanProcess.StartInfo.UseShellExecute = false;
-                    scanProcess.StartInfo.FileName = "cmd.exe";
-                    scanProcess.StartInfo.Arguments = "/c nslookup " + input;
-                    //scanProcess.StartInfo.Arguments = "/c nslookup " + input + " 8.8.8.8"; // This utilizes Google's DNS
-                    scanProcess.StartInfo.CreateNoWindow = true;
-                    scanProcess.Start();
-
-                    StreamReader sOut = scanProcess.StandardOutput;
-                    StringBuilder result = new StringBuilder();
-                    string temp;
-
-                    while ((temp = sOut.ReadLine()) != null)
-                    {
-                        result.AppendLine(temp);
-                    }
-
-                    sOut = scanProcess.StandardError;
-
-                    while ((temp = sOut.ReadLine()) != null)
-                    {
-                        result.AppendLine(temp);
-                    }
-
-                    sOut.Close();
-                    scanProcess.Close();
-
-                    char[] delimiterChars = { ',', '\t', '\r', '\n' };
-                    string[] words = result.ToString().Split(delimiterChars);
-
-                    writer.WriteStartObject();
-                    foreach (string s in words)
-                    {
-                        if (s != "")
-                        {
-                            writer.WritePropertyName("Output");
-                            writer.WriteValue(s);
-                        }
-                    }
-
-                    writer.WriteEndObject();
-                }
-                return sw.ToString();
+                csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
             }
+            else
+            {
+                if (type == "URL")
+                {
+                    input = new Uri(input).Host;
+                }
+
+                Process scanProcess = new Process();
+
+                scanProcess.StartInfo.RedirectStandardError = true;
+                scanProcess.StartInfo.RedirectStandardOutput = true;
+                scanProcess.StartInfo.UseShellExecute = false;
+                scanProcess.StartInfo.FileName = "cmd.exe";
+                scanProcess.StartInfo.Arguments = "/c nslookup " + input;
+                //scanProcess.StartInfo.Arguments = "/c nslookup " + input + " 8.8.8.8"; // This utilizes Google's DNS
+                scanProcess.StartInfo.CreateNoWindow = true;
+                scanProcess.Start();
+
+                StreamReader sOut = scanProcess.StandardOutput;
+                StringBuilder result = new StringBuilder();
+                string temp;
+
+                while ((temp = sOut.ReadLine()) != null)
+                {
+                    result.AppendLine(temp);
+                }
+
+                sOut = scanProcess.StandardError;
+
+                while ((temp = sOut.ReadLine()) != null)
+                {
+                    result.AppendLine(temp);
+                }
+
+                sOut.Close();
+                scanProcess.Close();
+
+                char[] delimiterChars = { ',', '\t', '\r', '\n' };
+                string[] words = result.ToString().Split(delimiterChars);
+
+
+                foreach (string s in words)
+                {
+                    if (s != "")
+                    {
+                        csv += "\"" + "Output" + "\"," + "\"" + s.Trim().ToString() + "\"\n";
+                    }
+                }
+            }
+            return csv;
         }
     }
 }

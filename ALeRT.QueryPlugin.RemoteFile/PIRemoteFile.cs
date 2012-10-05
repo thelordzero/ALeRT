@@ -56,26 +56,27 @@ namespace ALeRT.QueryPlugin
         public string Result(string input, string type, bool sensitive)
         {
             string csv = "\"Status\"," + "\"Message\"\n";
-                if (sensitive == true)
-                {
-                    csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
-                }
-                else
-                {
-                    try
-                    {
-                        WebClient webClient = new WebClient();
-                        webClient.DownloadFile(input, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\\\" + Path.GetFileName(new Uri(input).LocalPath));
-
-                        csv += "\"" + "Successful" + "\"," + "\"" + "" + "\"\n";
-                    }
-                    catch (WebException e)
-                    {
-                        csv += "\"" + "Error" + "\"," + "\"" + e.Message + "\"\n";
-                    }
-                }
-                return csv;
             
+            if (sensitive == true)
+            {
+                csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
+            }
+            else
+            {
+                try
+                {
+                    WebClient webClient = new WebClient();
+                    webClient.DownloadFile(input, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\\\" + Path.GetFileName(new Uri(input).LocalPath));
+
+                    csv += "\"" + "Successful" + "\"," + "\"" + "" + "\"\n";
+                }
+                catch (WebException e)
+                {
+                    csv += "\"" + "Error" + "\"," + "\"" + e.Message + "\"\n";
+                }
+            }
+            return csv;
+
         }
     }
 }
