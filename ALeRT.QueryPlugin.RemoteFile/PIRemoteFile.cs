@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Reactive.Linq;
 
 namespace ALeRT.QueryPlugin
 {
@@ -53,30 +54,33 @@ namespace ALeRT.QueryPlugin
             }
         }
 
-        public string Result(string input, string type, bool sensitive)
+        public System.IObservable<string> Result(string input, string type, bool sensitive)
         {
-            string csv = "\"Status\"," + "\"Message\"\n";
-            
-            if (sensitive == true)
+            return Observable.Start(() =>
             {
-                csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
-            }
-            else
-            {
-                try
-                {
-                    WebClient webClient = new WebClient();
-                    webClient.DownloadFile(input, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\\\" + Path.GetFileName(new Uri(input).LocalPath));
+                string csv = "\"Status\"," + "\"Message\"\n";
 
-                    csv += "\"" + "Successful" + "\"," + "\"" + "" + "\"\n";
-                }
-                catch (WebException e)
+                if (sensitive == true)
                 {
-                    csv += "\"" + "Error" + "\"," + "\"" + e.Message + "\"\n";
+                    csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
                 }
-            }
-            return csv;
+                else
+                {
+                    try
+                    {
+                        WebClient webClient = new WebClient();
+                        webClient.DownloadFile(input, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\\\" + Path.GetFileName(new Uri(input).LocalPath));
 
+                        csv += "\"" + "Successful" + "\"," + "\"" + "" + "\"\n";
+                    }
+                    catch (WebException e)
+                    {
+                        csv += "\"" + "Error" + "\"," + "\"" + e.Message + "\"\n";
+                    }
+                }
+                return csv;
+
+            });
         }
     }
 }

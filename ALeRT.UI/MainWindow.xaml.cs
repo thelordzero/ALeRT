@@ -1,7 +1,4 @@
 ﻿using ALeRT.PluginFramework;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +20,7 @@ using System.Windows.Shapes;
 using GenericParsing;
 using System.Windows.Markup;
 using System.Data;
+using System.Reactive.Linq;
 
 namespace ALeRT.UI
 {
@@ -84,7 +82,7 @@ namespace ALeRT.UI
 
         }
 
-        DataSet resultDS = new DataSet("Results");
+        IObservable<DataSet> resultsDS;
 
         [ImportMany]
         public IEnumerable<ITypePlugin> TPlugins { get; set; }
@@ -122,44 +120,38 @@ namespace ALeRT.UI
                     {
                         if (qType == tType) //Match the two List<strings>, one is the AcceptedTypes and the other is the one returned from ITypeQuery
                         {
-                            using (GenericParserAdapter parser = new GenericParserAdapter())
-                            {
-                                using (TextReader sr = new StringReader(qPlugins.Result(query, qType, sensitive)))
-                                {
-                                    Random rNum = new Random();
+                            IObservable<DataTable> q =
+                                from text in qPlugins.Result(query, qType, sensitive)
+                                from tempTable in Observable.Using(
+                                () => new GenericParserAdapter(),
+                                parser => Observable.Using(() => new StringReader(text),
+                                    sr => Observable.Start<DataTable>(
+                                        () =>
+                                        {
+                                            var rNum = new Random();
+                                            parser.SetDataSource(sr);
+                                            parser.ColumnDelimiter = Convert.ToChar(",");
+                                            parser.FirstRowHasHeader = true;
+                                            parser.MaxBufferSize = 4096;
+                                            parser.MaxRows = 500;
+                                            parser.TextQualifier = '\"';
 
-                                    parser.SetDataSource(sr);
-                                    parser.ColumnDelimiter = Convert.ToChar(",");
-                                    parser.FirstRowHasHeader = true;
-                                    parser.MaxBufferSize = 4096;
-                                    parser.MaxRows = 500;
-                                    parser.TextQualifier = '\"';
+                                            var tempTable = parser.GetDataTable();
+                                            tempTable.TableName = qPlugins.Name.ToString();
+                                            if (!tempTable.Columns.Contains("Query"))
+                                            {
+                                                DataColumn tColumn = new DataColumn("Query");
+                                                tempTable.Columns.Add(tColumn);
+                                                tColumn.SetOrdinal(0);
+                                            }
 
-                                    DataTable tempTable = parser.GetDataTable();
-                                    tempTable.TableName = qPlugins.Name.ToString();
-                                    if (!tempTable.Columns.Contains("Query"))
-                                    {
-                                        DataColumn tColumn = new DataColumn("Query");
-                                        tempTable.Columns.Add(tColumn);
-                                        tColumn.SetOrdinal(0);
-                                    }
+                                            foreach (DataRow dr in tempTable.Rows)
+                                                dr["Query"] = query;
 
-                                    foreach (DataRow dr in tempTable.Rows)
-                                    {
-                                        dr["Query"] = query;
-                                    }
-
-                                    if (!resultDS.Tables.Contains(qPlugins.Name.ToString()))
-                                    {
-                                        resultDS.Tables.Add(tempTable);
-                                    }
-                                    else
-                                    {
-                                        resultDS.Tables[qPlugins.Name.ToString()].Merge(tempTable);
-                                    }
-                                    pluginsLB.DataContext = resultDS.Tables.Cast<DataTable>().Select(t => t.TableName).ToList();
-                                }
-                            }
+                                            return tempTable;
+                                        }
+                                        )))
+                                select tempTable;
                         }
                     }
                 }
@@ -184,7 +176,7 @@ namespace ALeRT.UI
 
         private void pluginsLB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            resultsDG.ItemsSource = resultDS.Tables[pluginsLB.SelectedValue.ToString()].DefaultView;
+            //resultsDG.ItemsSource = resultsDS.Tables[pluginsLB.SelectedValue.ToString()].DefaultView;
         }
     }
 }

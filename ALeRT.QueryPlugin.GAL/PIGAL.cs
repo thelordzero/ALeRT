@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
-using Newtonsoft.Json;
+using System.Reactive.Linq;
 
 namespace ALeRT.QueryPlugin
 {
@@ -55,64 +55,67 @@ namespace ALeRT.QueryPlugin
             }
         }
 
-        public string Result(string input, string type, bool sensitive)
+        public System.IObservable<string> Result(string input, string type, bool sensitive)
         {
-            try
+            return Observable.Start(() =>
             {
-                var currentForest = Forest.GetCurrentForest();
-                var globalCatalog = currentForest.FindGlobalCatalog();
-
-                using (var searcher = globalCatalog.GetDirectorySearcher())
+                try
                 {
-                    using (var entry = new DirectoryEntry(searcher.SearchRoot.Path))
+                    var currentForest = Forest.GetCurrentForest();
+                    var globalCatalog = currentForest.FindGlobalCatalog();
+
+                    using (var searcher = globalCatalog.GetDirectorySearcher())
                     {
-                        if (type == "EMail")
+                        using (var entry = new DirectoryEntry(searcher.SearchRoot.Path))
                         {
-                            searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(mail=" + input + "))";
+                            if (type == "EMail")
+                            {
+                                searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(mail=" + input + "))";
+                            }
+
+                            if (type == "HASHID")
+                            {
+                                searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(sAMAccountName=" + input + "))";
+                            }
+
+                            if (type == "Name")
+                            {
+                                searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(anr=" + input + "))";
+                            }
+
+                            if (type == "PhoneNumber")
+                            {
+                                searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(telephoneNumber=" + input + "))";
+                            }
+
+                            if (type == "ZipCode")
+                            {
+                                searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(postalCode=" + input + "))";
+                            }
+
+                            searcher.PropertyNamesOnly = true;
+                            searcher.SearchScope = SearchScope.Subtree;
+                            searcher.Sort.Direction = SortDirection.Ascending;
+                            searcher.Sort.PropertyName = "displayName";
+
+                            LDAPInformation[] temp = (searcher.FindAll().Cast<SearchResult>().Select(result => new LDAPInformation(result.GetDirectoryEntry())).ToArray());
+
+                            string csv = "\"" + "DisplayName" + "\"," + "\"" + "EMail" + "\"," + "\"" + "HASH" + "\"," + "\"" + "Phone" + "\"\n";
+
+                            foreach (LDAPInformation t in temp)
+                            {
+                                csv += "\"" + t.DisplayName + "\"," + "\"" + t.Mail + "\"," + "\"" + t.sAMAccountName + "\"," + "\"" + t.TelephoneNumber + "\"\n";
+                            }
+
+                            return csv;
                         }
-
-                        if (type == "HASHID")
-                        {
-                            searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(sAMAccountName=" + input + "))";
-                        }
-
-                        if (type == "Name")
-                        {
-                            searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(anr=" + input + "))";
-                        }
-
-                        if (type == "PhoneNumber")
-                        {
-                            searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(telephoneNumber=" + input + "))";
-                        }
-
-                        if (type == "ZipCode")
-                        {
-                            searcher.Filter = "(&(mailnickname=*)(objectCategory=user)(postalCode=" + input + "))";
-                        }
-
-                        searcher.PropertyNamesOnly = true;
-                        searcher.SearchScope = SearchScope.Subtree;
-                        searcher.Sort.Direction = SortDirection.Ascending;
-                        searcher.Sort.PropertyName = "displayName";
-
-                        LDAPInformation[] temp = (searcher.FindAll().Cast<SearchResult>().Select(result => new LDAPInformation(result.GetDirectoryEntry())).ToArray());
-
-                        string csv = "\"" + "DisplayName" + "\"," + "\"" + "EMail" + "\"," + "\"" + "HASH" + "\"," + "\"" + "Phone" + "\"\n";
-
-                        foreach (LDAPInformation t in temp)
-                        {
-                            csv += "\"" + t.DisplayName + "\"," + "\"" + t.Mail + "\"," + "\"" + t.sAMAccountName + "\"," + "\"" + t.TelephoneNumber + "\"\n";
-                        }
-
-                        return csv;
                     }
                 }
-            }
-            catch (ActiveDirectoryOperationException e)
-            {
-                return e.Message;
-            }
+                catch (ActiveDirectoryOperationException e)
+                {
+                    return e.Message;
+                }
+            });
         }
     }
 

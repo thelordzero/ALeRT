@@ -13,7 +13,6 @@
         </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="36"/>
-            <!--<RowDefinition Height="20"/>-->
             <RowDefinition Height="*"/>
             <RowDefinition Height="36"/>
         </Grid.RowDefinitions>
@@ -28,7 +27,7 @@
         </StackPanel>
         <DataGrid Name="resultsDG" Grid.Row="1" Margin="5" IsReadOnly="True"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="SteelBlue" Grid.Row="2">
-            <TextBlock Text="Plugin:" VerticalAlignment="Center" Margin="5"/>
+            <TextBlock Text="Plugin Results:" VerticalAlignment="Center" Margin="5"/>
             <ComboBox Name="pluginsLB" Margin="5" Width="150" IsReadOnly="True" ItemsSource="{Binding}" SelectionChanged="pluginsLB_SelectionChanged"/>
         </StackPanel>
     </Grid>
