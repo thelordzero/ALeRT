@@ -7,6 +7,6 @@
         string Version { get; }
         string Author { get; }
         System.Collections.Generic.List<string> TypesAccepted { get; }
-        System.IObservable<string> Result(string input, string type, bool sensitive);
+        string Result(string input, string type, bool sensitive);
     }
 }

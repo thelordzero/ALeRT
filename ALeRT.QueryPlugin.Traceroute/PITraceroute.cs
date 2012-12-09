@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Reactive.Linq;
 using System.Text;
 
 namespace ALeRT.QueryPlugin
@@ -55,54 +54,51 @@ namespace ALeRT.QueryPlugin
             }
         }
 
-        public System.IObservable<string> Result(string input, string type, bool sensitive)
+        public string Result(string input, string type, bool sensitive)
         {
-            return Observable.Start(() =>
+            string csv = "\"Address\"," + "\"Hop\"," + "\"Roundtrip Time\"," + "\"Status\"\n";
+
+            if (sensitive == true)
             {
-                string csv = "\"Address\"," + "\"Hop\"," + "\"Roundtrip Time\"," + "\"Status\"\n";
-
-                if (sensitive == true)
+                csv += "\"" + "" + "\"," + "\"" + "" + "\"," + "\"" + "" + "\"," + "\"" + "FORBIDDEN" + "\"\n";
+            }
+            else
+            {
+                if (type == "URL")
                 {
-                    csv += "\"" + "" + "\"," + "\"" + "" + "\"," + "\"" + "" + "\"," + "\"" + "FORBIDDEN" + "\"\n";
+                    input = new Uri(input).Host.ToString();
                 }
-                else
+
+                int iHopcount = 30;
+                int iTimeout = 500;
+
+                System.Collections.ArrayList arlPingReply = new System.Collections.ArrayList();
+                Ping myPing = new Ping();
+                PingReply prResult;
+
+                for (int iC1 = 1; iC1 < iHopcount; iC1++)
                 {
-                    if (type == "URL")
+                    prResult = myPing.Send(input, iTimeout, new byte[10], new PingOptions(iC1, false));
+                    if (prResult.Status == IPStatus.Success)
                     {
-                        input = new Uri(input).Host.ToString();
+                        iC1 = iHopcount;
                     }
+                    arlPingReply.Add(prResult);
+                }
 
-                    int iHopcount = 30;
-                    int iTimeout = 500;
+                PingReply[] prReturnValue = new PingReply[arlPingReply.Count];
 
-                    System.Collections.ArrayList arlPingReply = new System.Collections.ArrayList();
-                    Ping myPing = new Ping();
-                    PingReply prResult;
+                for (int iC1 = 0; iC1 < arlPingReply.Count; iC1++)
+                {
+                    prReturnValue[iC1] = (PingReply)arlPingReply[iC1];
 
-                    for (int iC1 = 1; iC1 < iHopcount; iC1++)
+                    if (prReturnValue[iC1].Address != null)
                     {
-                        prResult = myPing.Send(input, iTimeout, new byte[10], new PingOptions(iC1, false));
-                        if (prResult.Status == IPStatus.Success)
-                        {
-                            iC1 = iHopcount;
-                        }
-                        arlPingReply.Add(prResult);
-                    }
-
-                    PingReply[] prReturnValue = new PingReply[arlPingReply.Count];
-
-                    for (int iC1 = 0; iC1 < arlPingReply.Count; iC1++)
-                    {
-                        prReturnValue[iC1] = (PingReply)arlPingReply[iC1];
-
-                        if (prReturnValue[iC1].Address != null)
-                        {
-                            csv += "\"" + prReturnValue[iC1].Address.ToString() + "\"," + "\"" + iC1.ToString() + "\"," + "\"" + prReturnValue[iC1].RoundtripTime.ToString() + "\"," + "\"" + prReturnValue[iC1].Status.ToString() + "\"\n";
-                        }
+                        csv += "\"" + prReturnValue[iC1].Address.ToString() + "\"," + "\"" + iC1.ToString() + "\"," + "\"" + prReturnValue[iC1].RoundtripTime.ToString() + "\"," + "\"" + prReturnValue[iC1].Status.ToString() + "\"\n";
                     }
                 }
-                return csv;
-            });
+            }
+            return csv;
         }
     }
 }

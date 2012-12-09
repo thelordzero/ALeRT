@@ -6,7 +6,6 @@ using System.Net;
 using System.Text;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Reactive.Linq;
 
 namespace ALeRT.QueryPlugin
 {
@@ -54,33 +53,30 @@ namespace ALeRT.QueryPlugin
             }
         }
 
-        public System.IObservable<string> Result(string input, string type, bool sensitive)
+        public string Result(string input, string type, bool sensitive)
         {
-            return Observable.Start(() =>
+            string csv = "\"Status\"," + "\"Message\"\n";
+            
+            if (sensitive == true)
             {
-                string csv = "\"Status\"," + "\"Message\"\n";
-
-                if (sensitive == true)
+                csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
+            }
+            else
+            {
+                try
                 {
-                    csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
+                    WebClient webClient = new WebClient();
+                    webClient.DownloadFile(input, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\\\" + Path.GetFileName(new Uri(input).LocalPath));
+
+                    csv += "\"" + "Successful" + "\"," + "\"" + "" + "\"\n";
                 }
-                else
+                catch (WebException e)
                 {
-                    try
-                    {
-                        WebClient webClient = new WebClient();
-                        webClient.DownloadFile(input, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\\\" + Path.GetFileName(new Uri(input).LocalPath));
-
-                        csv += "\"" + "Successful" + "\"," + "\"" + "" + "\"\n";
-                    }
-                    catch (WebException e)
-                    {
-                        csv += "\"" + "Error" + "\"," + "\"" + e.Message + "\"\n";
-                    }
+                    csv += "\"" + "Error" + "\"," + "\"" + e.Message + "\"\n";
                 }
-                return csv;
+            }
+            return csv;
 
-            });
         }
     }
 }

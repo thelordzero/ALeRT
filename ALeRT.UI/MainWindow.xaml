@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ALeRT" MinHeight="350" MinWidth="550"
         FocusManager.FocusedElement="{Binding ElementName=queryTB}">
-    
     <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -25,10 +24,22 @@
                 <CheckBox Content="Sensitive" Margin="0,0,5,0" Name="sensitiveCB"/>
             </StackPanel>
         </StackPanel>
-        <DataGrid Name="resultsDG" Grid.Row="1" Margin="5" IsReadOnly="True"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="SteelBlue" Grid.Row="2">
-            <TextBlock Text="Plugin Results:" VerticalAlignment="Center" Margin="5"/>
-            <ComboBox Name="pluginsLB" Margin="5" Width="150" IsReadOnly="True" ItemsSource="{Binding}" SelectionChanged="pluginsLB_SelectionChanged"/>
-        </StackPanel>
+        <DataGrid Name="resultsDG" Grid.Row="1" Margin="5" IsReadOnly="True" IsTextSearchEnabled="True" AlternationCount="2" AlternatingRowBackground="AliceBlue"/>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="SteelBlue" Grid.Column="0">
+                <TextBlock Text="Plugin Results:" VerticalAlignment="Center" Margin="5"/>
+                <ComboBox Name="pluginsLB" Margin="5" Width="150" IsReadOnly="True" ItemsSource="{Binding}" SelectionChanged="pluginsLB_SelectionChanged"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Background="SteelBlue"  Grid.Column="2">
+                <Button Name="clearButton" Content="Clear Data" Margin="5,5,0,5" VerticalContentAlignment="Center" Width="80" Click="clearButton_Click" />
+                <Button Name="exportButton" Content="Export Data" Margin="5" VerticalContentAlignment="Center" Width="80" Click="exportButton_Click"/>
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </Window>

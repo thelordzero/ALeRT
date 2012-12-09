@@ -9,7 +9,6 @@ using System.IO;
 using System.Management;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Reactive.Linq;
 
 namespace ALeRT.QueryPlugin
 {
@@ -57,67 +56,64 @@ namespace ALeRT.QueryPlugin
             }
         }
 
-        public System.IObservable<string> Result(string input, string type, bool sensitive)
+        public string Result(string input, string type, bool sensitive)
         {
-            return Observable.Start(() =>
+            string csv = "\"Status\"," + "\"Message\"\n";
+
+            if (sensitive == true)
             {
-                string csv = "\"Status\"," + "\"Message\"\n";
-
-                if (sensitive == true)
+                csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
+            }
+            else
+            {
+                if (type == "URL")
                 {
-                    csv += "\"" + "FORBIDDEN" + "\"," + "\"" + "" + "\"\n";
+                    input = new Uri(input).Host;
                 }
-                else
+
+                Process scanProcess = new Process();
+
+                scanProcess.StartInfo.RedirectStandardError = true;
+                scanProcess.StartInfo.RedirectStandardOutput = true;
+                scanProcess.StartInfo.UseShellExecute = false;
+                scanProcess.StartInfo.FileName = "cmd.exe";
+                scanProcess.StartInfo.Arguments = "/c nslookup " + input;
+                //scanProcess.StartInfo.Arguments = "/c nslookup " + input + " 8.8.8.8"; // This utilizes Google's DNS
+                scanProcess.StartInfo.CreateNoWindow = true;
+                scanProcess.Start();
+
+                StreamReader sOut = scanProcess.StandardOutput;
+                StringBuilder result = new StringBuilder();
+                string temp;
+
+                while ((temp = sOut.ReadLine()) != null)
                 {
-                    if (type == "URL")
+                    result.AppendLine(temp);
+                }
+
+                sOut = scanProcess.StandardError;
+
+                while ((temp = sOut.ReadLine()) != null)
+                {
+                    result.AppendLine(temp);
+                }
+
+                sOut.Close();
+                scanProcess.Close();
+
+                char[] delimiterChars = { ',', '\t', '\r', '\n' };
+                string[] words = result.ToString().Split(delimiterChars);
+
+
+                foreach (string s in words)
+                {
+                    if (s != "")
                     {
-                        input = new Uri(input).Host;
-                    }
-
-                    Process scanProcess = new Process();
-
-                    scanProcess.StartInfo.RedirectStandardError = true;
-                    scanProcess.StartInfo.RedirectStandardOutput = true;
-                    scanProcess.StartInfo.UseShellExecute = false;
-                    scanProcess.StartInfo.FileName = "cmd.exe";
-                    scanProcess.StartInfo.Arguments = "/c nslookup " + input;
-                    //scanProcess.StartInfo.Arguments = "/c nslookup " + input + " 8.8.8.8"; // This utilizes Google's DNS
-                    scanProcess.StartInfo.CreateNoWindow = true;
-                    scanProcess.Start();
-
-                    StreamReader sOut = scanProcess.StandardOutput;
-                    StringBuilder result = new StringBuilder();
-                    string temp;
-
-                    while ((temp = sOut.ReadLine()) != null)
-                    {
-                        result.AppendLine(temp);
-                    }
-
-                    sOut = scanProcess.StandardError;
-
-                    while ((temp = sOut.ReadLine()) != null)
-                    {
-                        result.AppendLine(temp);
-                    }
-
-                    sOut.Close();
-                    scanProcess.Close();
-
-                    char[] delimiterChars = { ',', '\t', '\r', '\n' };
-                    string[] words = result.ToString().Split(delimiterChars);
-
-
-                    foreach (string s in words)
-                    {
-                        if (s != "")
-                        {
-                            csv += "\"" + "Output" + "\"," + "\"" + s.Trim().ToString() + "\"\n";
-                        }
+                        csv += "\"" + "Output" + "\"," + "\"" + s.Trim().ToString() + "\"\n";
                     }
                 }
-                return csv;
-            });
+            }
+            return csv;
         }
     }
 }

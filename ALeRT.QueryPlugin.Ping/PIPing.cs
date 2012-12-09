@@ -7,7 +7,6 @@ using System.Net.NetworkInformation;
 using System.ComponentModel.Composition;
 using ALeRT.PluginFramework;
 using System.IO;
-using System.Reactive.Linq;
 
 namespace ALeRT.QueryPlugin
 {
@@ -54,28 +53,26 @@ namespace ALeRT.QueryPlugin
             }
         }
 
-        public System.IObservable<string> Result(string input, string type, bool sensitive)
+        public string Result(string input, string type, bool sensitive)
         {
-            return Observable.Start(() =>
+            string csv = "\"Roundtrip Time\"," + "\"Status\"\n";
+
+            if (sensitive == true)
             {
-                var csv = "\"Roundtrip Time\",\"Status\"\n";
-
-                if (sensitive == true)
+                csv += "\"" + "" + "\"," + "\"" + "FORBIDDEN" + "\"\n";
+            }
+            else
+            {
+                if (type == "URL")
                 {
-                    csv += "\"\",\"FORBIDDEN\"\n";
+                    input = new Uri(input).Host;
                 }
-                else
-                {
-                    var input2 = type == "URL" ? new Uri(input).Host : input;
-                    var ping = new Ping();
-                    var pingReply = ping.Send(input2);
+                Ping ping = new Ping();
+                PingReply pingReply = ping.Send(input);
 
-                    csv += String.Format("\"{0}\",\"{1}\"\n",
-                        pingReply.RoundtripTime, pingReply.Status);
-                }
-
-                return csv;
-            });
+                csv += "\"" + pingReply.RoundtripTime.ToString() + "\"," + "\"" + pingReply.Status.ToString() + "\"\n";
+            }
+            return csv;
         }
     }
 }
